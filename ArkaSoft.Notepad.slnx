@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/Src/">
+    <Project Path="Src/ArkaSoft.Notepad.UI/ArkaSoft.Notepad.UI.csproj" />
+  </Folder>
+  <Folder Name="/Test/" />
+</Solution>

@@ -1,0 +1,186 @@
+# =========================================
+# .NET / Visual Studio / WPF .gitignore
+# =========================================
+
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa]rm/
+[Aa]rm64/
+
+# Visual Studio cache and user-specific files
+.vs/
+*.user
+*.userosscache
+*.suo
+*.rsuser
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# Test results
+Test/
+TestResults/
+[Tt]est[Rr]esult*/
+*.trx
+
+# Coverage reports
+coverage/
+.coverage
+*.coverage
+*.coveragexml
+*.opencover.xml
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# NuGet package restore files
+*.nuget.props
+*.nuget.targets
+
+# ASP.NET temporary files
+wwwroot/lib/
+wwwroot/css/
+wwwroot/js/
+
+# Entity Framework migrations temporary files
+*.edmx.diagram
+
+# Generated files
+Generated/
+generated/
+*.generated.cs
+*.g.cs
+*.g.i.cs
+*.Designer.cs
+
+# WPF generated files
+*.g.resources
+*.resources
+*.cache
+*.pdb
+*.dll
+*.exe
+*.winmd
+
+# ClickOnce
+publish/
+Publish/
+*.application
+*.deploy
+*.manifest
+
+# Deployment and packaging
+AppPackages/
+BundleArtifacts/
+Installers/
+*.appx
+*.appxbundle
+*.msix
+*.msixbundle
+
+# Publish profiles
+Properties/PublishProfiles/
+*.pubxml.user
+
+# Local configuration files
+appsettings.Local.json
+appsettings.Development.json
+appsettings.*.Local.json
+
+# User secrets
+secrets.json
+secrets.*.json
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Local databases
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.mdf
+*.ndf
+*.ldf
+
+# Logs
+logs/
+Logs/
+*.log
+
+# Temporary files
+[Tt]emp/
+tmp/
+*.tmp
+*.temp
+*.bak
+*.old
+*.orig
+*.swp
+*.swo
+*~
+
+# Windows files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Visual Studio profiler files
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# Code analysis
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Microsoft Azure publishing
+.azurePubxml/
+DotSettings.user
+
+# Microsoft Azure publishing
+.azurePubxml/
+ignore
+docker-compose.override.yml
+
+# Local tools
+.dotnet/
+tools/
+
+# MinGW / C++ artifacts
+*.opensdf
+*.sdf
+*.VC.db
+ipch/
+
+# Crash dumps
+*.dmp
+
+# OS generated files
+.DS_Store
+
+# Backup folders
+_backup/
+backup/
