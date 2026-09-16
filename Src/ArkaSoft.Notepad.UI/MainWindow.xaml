@@ -1,12 +1,282 @@
-﻿<Window x:Class="ArkaSoft.Notepad.UI.MainWindow"
+<Window x:Class="ArkaSoft.Notepad.UI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ArkaSoft.Notepad.UI"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        xmlns:cmd="clr-namespace:ArkaSoft.Notepad.UI.Helpers"
+        xmlns:controls="clr-namespace:ArkaSoft.Notepad.UI.Controls"
+        Title="Untitled - Notepad"
+        Width="940" Height="640" MinWidth="500" MinHeight="360"
+        Background="{DynamicResource C.Window}"
+        FontFamily="{DynamicResource F.Ui}"
+        UseLayoutRounding="True" SnapsToDevicePixels="True"
+        AllowDrop="True"
+        TextOptions.TextFormattingMode="Display"
+        Closed="Window_Closed"
+        Closing="Window_Closing"
+        DragOver="Window_DragOver" Drop="Window_Drop"
+        PreviewMouseWheel="Window_PreviewMouseWheel">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="40"
+                      ResizeBorderThickness="6"
+                      GlassFrameThickness="0,0,0,1"
+                      CornerRadius="0"/>
+    </WindowChrome.WindowChrome>
 
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Control" Key="N" Command="{x:Static cmd:AppCommands.NewTab}"/>
+        <KeyBinding Modifiers="Control" Key="W" Command="ApplicationCommands.Close"/>
+        <KeyBinding Modifiers="Control" Key="Tab" Command="{x:Static cmd:AppCommands.NextTab}"/>
+        <KeyBinding Modifiers="Control+Shift" Key="Tab" Command="{x:Static cmd:AppCommands.PreviousTab}"/>
+        <KeyBinding Modifiers="Control" Key="OemPlus" Command="{x:Static cmd:AppCommands.ZoomIn}"/>
+        <KeyBinding Modifiers="Control" Key="Add" Command="{x:Static cmd:AppCommands.ZoomIn}"/>
+        <KeyBinding Modifiers="Control" Key="OemMinus" Command="{x:Static cmd:AppCommands.ZoomOut}"/>
+        <KeyBinding Modifiers="Control" Key="Subtract" Command="{x:Static cmd:AppCommands.ZoomOut}"/>
+        <KeyBinding Modifiers="Control" Key="D0" Command="{x:Static cmd:AppCommands.ZoomReset}"/>
+        <KeyBinding Modifiers="Control" Key="NumPad0" Command="{x:Static cmd:AppCommands.ZoomReset}"/>
+    </Window.InputBindings>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static cmd:AppCommands.NewTab}" Executed="NewTab_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.NewWindow}" Executed="NewWindow_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.Open}" Executed="Open_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.Save}" Executed="Save_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.SaveAs}" Executed="SaveAs_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.Rename}" Executed="Rename_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.PageSetup}" Executed="PageSetup_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.Print}" Executed="Print_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.Exit}" Executed="Exit_Executed"/>
+        <CommandBinding Command="ApplicationCommands.Close" Executed="CloseTab_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.Find}" Executed="Find_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.FindNext}" Executed="FindNext_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.FindPrevious}" Executed="FindPrevious_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.Replace}" Executed="Replace_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.GoTo}" Executed="GoTo_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.InsertTimeDate}" Executed="InsertTimeDate_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.ZoomIn}" Executed="ZoomIn_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.ZoomOut}" Executed="ZoomOut_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.ZoomReset}" Executed="ZoomReset_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.ToggleWordWrap}" Executed="WordWrap_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.ToggleStatusBar}" Executed="StatusBar_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.SetThemeSystem}" Executed="ThemeSystem_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.SetThemeLight}" Executed="ThemeLight_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.SetThemeDark}" Executed="ThemeDark_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.NextTab}" Executed="NextTab_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.PreviousTab}" Executed="PreviousTab_Executed"/>
+    </Window.CommandBindings>
+
+    <Grid x:Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ============ Title bar with tabs ============ -->
+        <Grid Grid.Row="0" Background="Transparent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Grid.Column="0" Width="16" Height="16" Margin="14,0,10,0"
+                   VerticalAlignment="Center" HorizontalAlignment="Center"
+                   Source="/Assets/Icons/appLogo.png"
+                   WindowChrome.IsHitTestVisibleInChrome="True"
+                   MouseLeftButtonDown="AppIcon_MouseLeftButtonDown"
+                   MouseLeftButtonUp="AppIcon_MouseLeftButtonUp"
+                   ToolTip="Notepad"/>
+
+            <TabControl Grid.Column="1" x:Name="DocTabs"
+                        Style="{StaticResource TitleTabs}"
+                        ItemContainerStyle="{StaticResource TitleTabItem}"
+                        MinWidth="120"
+                        WindowChrome.IsHitTestVisibleInChrome="True"
+                        SelectionChanged="DocTabs_SelectionChanged"
+                        PreviewMouseDown="DocTabs_PreviewMouseDown"/>
+
+            <Button Grid.Column="2" x:Name="NewTabButton"
+                    Style="{StaticResource Btn.Icon}" Width="30" Height="30"
+                    Content="&#xE710;" FontSize="11" ToolTip="New tab (Ctrl+T)"
+                    WindowChrome.IsHitTestVisibleInChrome="True"
+                    Command="{x:Static cmd:AppCommands.NewTab}"/>
+
+            <StackPanel Grid.Column="4" Orientation="Horizontal"
+                        WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button x:Name="MinimizeButton" Style="{StaticResource WBtn}" Content="&#xE921;"
+                        ToolTip="Minimize" Click="MinimizeButton_Click"/>
+                <Button x:Name="MaximizeButton" Style="{StaticResource WBtn}" Content="&#xE922;"
+                        ToolTip="Maximize" Click="MaximizeButton_Click"/>
+                <Button x:Name="CloseButton" Style="{StaticResource WBtn.Close}"
+                        ToolTip="Close" Click="CloseButton_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- ============ Menu bar ============ -->
+        <Menu Grid.Row="1" Margin="8,0,0,0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New tab" Command="{x:Static cmd:AppCommands.NewTab}">
+                    <MenuItem.Icon>
+                        <TextBlock Text="&#xE7C3;" FontFamily="{DynamicResource F.Icons}" FontSize="14"
+                                   Foreground="{DynamicResource C.Text2}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="New _window" Command="{x:Static cmd:AppCommands.NewWindow}"/>
+                <MenuItem Header="_Open..." Command="{x:Static cmd:AppCommands.Open}">
+                    <MenuItem.Icon>
+                        <TextBlock Text="&#xE8E5;" FontFamily="{DynamicResource F.Icons}" FontSize="14"
+                                   Foreground="{DynamicResource C.Text2}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="_Save" Command="{x:Static cmd:AppCommands.Save}">
+                    <MenuItem.Icon>
+                        <TextBlock Text="&#xE74E;" FontFamily="{DynamicResource F.Icons}" FontSize="14"
+                                   Foreground="{DynamicResource C.Text2}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Save _as..." Command="{x:Static cmd:AppCommands.SaveAs}"/>
+                <MenuItem Header="_Rename" Command="{x:Static cmd:AppCommands.Rename}"
+                          x:Name="RenameMenuItem"/>
+                <Separator/>
+                <MenuItem Header="Page set_up" Command="{x:Static cmd:AppCommands.PageSetup}"/>
+                <MenuItem Header="_Print" Command="{x:Static cmd:AppCommands.Print}">
+                    <MenuItem.Icon>
+                        <TextBlock Text="&#xE749;" FontFamily="{DynamicResource F.Icons}" FontSize="14"
+                                   Foreground="{DynamicResource C.Text2}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="E_xit" Command="{x:Static cmd:AppCommands.Exit}"/>
+            </MenuItem>
+
+            <MenuItem Header="_Edit">
+                <MenuItem Header="_Undo" Command="ApplicationCommands.Undo"/>
+                <MenuItem Header="_Redo" Command="ApplicationCommands.Redo"/>
+                <Separator/>
+                <MenuItem Header="Cu_t" Command="ApplicationCommands.Cut"/>
+                <MenuItem Header="_Copy" Command="ApplicationCommands.Copy"/>
+                <MenuItem Header="_Paste" Command="ApplicationCommands.Paste"/>
+                <MenuItem Header="De_lete" Command="ApplicationCommands.Delete"/>
+                <Separator/>
+                <MenuItem Header="_Find" Command="{x:Static cmd:AppCommands.Find}">
+                    <MenuItem.Icon>
+                        <TextBlock Text="&#xE721;" FontFamily="{DynamicResource F.Icons}" FontSize="14"
+                                   Foreground="{DynamicResource C.Text2}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Find _next" Command="{x:Static cmd:AppCommands.FindNext}"/>
+                <MenuItem Header="Find pre_vious" Command="{x:Static cmd:AppCommands.FindPrevious}"/>
+                <MenuItem Header="_Replace" Command="{x:Static cmd:AppCommands.Replace}"/>
+                <MenuItem Header="_Go to" Command="{x:Static cmd:AppCommands.GoTo}"/>
+                <Separator/>
+                <MenuItem Header="Select _all" Command="ApplicationCommands.SelectAll"/>
+                <MenuItem Header="Time/_date" Command="{x:Static cmd:AppCommands.InsertTimeDate}">
+                    <MenuItem.Icon>
+                        <TextBlock Text="&#xE823;" FontFamily="{DynamicResource F.Icons}" FontSize="14"
+                                   Foreground="{DynamicResource C.Text2}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+
+            <MenuItem Header="_View">
+                <MenuItem Header="Zoom">
+                    <MenuItem Header="Zoom _in" Command="{x:Static cmd:AppCommands.ZoomIn}"
+                              InputGestureText="Ctrl + Plus"/>
+                    <MenuItem Header="Zoom _out" Command="{x:Static cmd:AppCommands.ZoomOut}"
+                              InputGestureText="Ctrl + Minus"/>
+                    <MenuItem Header="_Restore default zoom" Command="{x:Static cmd:AppCommands.ZoomReset}"
+                              InputGestureText="Ctrl + 0"/>
+                </MenuItem>
+                <MenuItem Header="_Word wrap" x:Name="WordWrapMenuItem"
+                          Command="{x:Static cmd:AppCommands.ToggleWordWrap}"
+                          IsCheckable="True"/>
+                <MenuItem Header="_Status bar" x:Name="StatusBarMenuItem"
+                          Command="{x:Static cmd:AppCommands.ToggleStatusBar}"
+                          IsCheckable="True" IsChecked="True"/>
+                <Separator/>
+                <MenuItem Header="App theme">
+                    <MenuItem Header="Use system setting" x:Name="ThemeSystemMenuItem"
+                              Command="{x:Static cmd:AppCommands.SetThemeSystem}"
+                              IsCheckable="True"/>
+                    <MenuItem Header="Light" x:Name="ThemeLightMenuItem"
+                              Command="{x:Static cmd:AppCommands.SetThemeLight}"
+                              IsCheckable="True"/>
+                    <MenuItem Header="Dark" x:Name="ThemeDarkMenuItem"
+                              Command="{x:Static cmd:AppCommands.SetThemeDark}"
+                              IsCheckable="True"/>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+
+        <!-- ============ Editor area ============ -->
+        <Grid Grid.Row="2">
+            <ContentPresenter x:Name="EditorHost"/>
+            <controls:FindReplacePanel x:Name="FindPanel"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Top"
+                                       Visibility="Collapsed"/>
+        </Grid>
+
+        <!-- ============ Status bar ============ -->
+        <Border Grid.Row="3" x:Name="StatusBar"
+                Background="{DynamicResource C.Window}"
+                BorderBrush="{DynamicResource C.Line}"
+                BorderThickness="0,1,0,0">
+            <Grid Margin="8,0" Height="34">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" x:Name="LnColPanel" Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <TextBlock x:Name="LnText" Text="Ln 1" FontSize="12"
+                               Foreground="{DynamicResource C.Text2}" Margin="6,0,0,0"/>
+                    <TextBlock x:Name="ColText" Text=", Col 1" FontSize="12"
+                               Foreground="{DynamicResource C.Text2}" Margin="4,0,10,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="ZoomOutStatus" Style="{StaticResource Btn.Icon}"
+                            Width="26" Height="24" FontSize="14" FontFamily="Segoe UI"
+                            Content="−" ToolTip="Zoom out (Ctrl + Minus)"
+                            Command="{x:Static cmd:AppCommands.ZoomOut}"/>
+                    <Button x:Name="ZoomStatus" Style="{StaticResource Btn.Icon}"
+                            Width="52" Height="24" FontFamily="{DynamicResource F.Ui}"
+                            FontSize="12" Content="100%" ToolTip="Restore default zoom (Ctrl + 0)"
+                            Command="{x:Static cmd:AppCommands.ZoomReset}"/>
+                    <Button x:Name="ZoomInStatus" Style="{StaticResource Btn.Icon}"
+                            Width="26" Height="24" FontSize="14" FontFamily="Segoe UI"
+                            Content="+" ToolTip="Zoom in (Ctrl + Plus)"
+                            Command="{x:Static cmd:AppCommands.ZoomIn}"/>
+                </StackPanel>
+
+                <Border Grid.Column="2" Width="1" Height="16"
+                        Background="{DynamicResource C.Line}" Margin="6,0,10,0"
+                        VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Column="4" x:Name="LinesText" Text="1 line" FontSize="12"
+                           Foreground="{DynamicResource C.Text2}" Margin="0,0,12,0"
+                           VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="5" x:Name="CharsText" Text="0 characters" FontSize="12"
+                           Foreground="{DynamicResource C.Text2}" Margin="0,0,12,0"
+                           VerticalAlignment="Center"/>
+                <Border Grid.Column="6" Width="1" Height="16"
+                        Background="{DynamicResource C.Line}" Margin="0,0,10,0"
+                        VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="7" x:Name="EncodingText" Text="UTF-8" FontSize="12"
+                           Foreground="{DynamicResource C.Text2}" Margin="0,0,6,0"
+                           VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

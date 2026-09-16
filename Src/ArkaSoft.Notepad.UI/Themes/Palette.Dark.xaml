@@ -1,0 +1,60 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Window / mica-like backgrounds -->
+    <SolidColorBrush x:Key="C.Window" Color="#202020"/>
+    <SolidColorBrush x:Key="C.Surface" Color="#202020"/>
+    <SolidColorBrush x:Key="C.SurfaceAlt" Color="#2C2C2C"/>
+    <SolidColorBrush x:Key="C.Tab.Selected" Color="#323232"/>
+    <SolidColorBrush x:Key="C.Tab.Hover" Color="#2A2A2A"/>
+
+    <!-- Interaction states -->
+    <SolidColorBrush x:Key="C.Hover" Color="#2E2E2E"/>
+    <SolidColorBrush x:Key="C.Pressed" Color="#343434"/>
+    <SolidColorBrush x:Key="C.Disabled" Color="#2A2A2A"/>
+
+    <!-- Lines & text -->
+    <SolidColorBrush x:Key="C.Line" Color="#383838"/>
+    <SolidColorBrush x:Key="C.Text" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="C.Text2" Color="#C8C8C8"/>
+    <SolidColorBrush x:Key="C.TextDisabled" Color="#6E6E6E"/>
+
+    <!-- Accent -->
+    <SolidColorBrush x:Key="C.Accent" Color="#4CC2FF"/>
+    <SolidColorBrush x:Key="C.AccentHover" Color="#69CBFF"/>
+    <SolidColorBrush x:Key="C.AccentPressed" Color="#2BA8EE"/>
+    <SolidColorBrush x:Key="C.AccentText" Color="#0B141D"/>
+
+    <!-- Inputs -->
+    <SolidColorBrush x:Key="C.Control" Color="#333333"/>
+    <SolidColorBrush x:Key="C.ControlBorder" Color="#5A5A5A"/>
+
+    <!-- Editor -->
+    <SolidColorBrush x:Key="C.Selection" Color="#2F5C9B"/>
+    <SolidColorBrush x:Key="C.Highlight.Bg" Color="#77630A"/>
+    <SolidColorBrush x:Key="C.Highlight.Fg" Color="#FFFFFF"/>
+
+    <!-- Window chrome -->
+    <SolidColorBrush x:Key="C.CloseHover" Color="#C42B1C"/>
+    <SolidColorBrush x:Key="C.CloseHoverFg" Color="#FFFFFF"/>
+
+    <!-- ScrollBar -->
+    <SolidColorBrush x:Key="C.ScrollThumb" Color="#4E4E4E"/>
+    <SolidColorBrush x:Key="C.ScrollThumbHover" Color="#616161"/>
+
+    <Color x:Key="Color.Shadow">#66000000</Color>
+
+    <DropShadowEffect x:Key="Fx.Popup" BlurRadius="18" ShadowDepth="2" Direction="270"
+                      Opacity="0.4" Color="{StaticResource Color.Shadow}"/>
+
+    <!-- Typography -->
+    <FontFamily x:Key="F.Ui">Segoe UI Variable Display, Segoe UI, Vazir</FontFamily>
+    <FontFamily x:Key="F.Icons">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+    <FontFamily x:Key="F.Editor">Consolas, Cascadia Mono, Courier New</FontFamily>
+
+    <system:Double x:Key="Sz.Font.Base" xmlns:system="clr-namespace:System;assembly=mscorlib">13</system:Double>
+
+    <CornerRadius x:Key="R.Small">4</CornerRadius>
+    <CornerRadius x:Key="R.Medium">6</CornerRadius>
+    <CornerRadius x:Key="R.Large">8</CornerRadius>
+</ResourceDictionary>

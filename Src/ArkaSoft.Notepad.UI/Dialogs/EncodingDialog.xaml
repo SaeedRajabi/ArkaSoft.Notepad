@@ -1,0 +1,28 @@
+<Window x:Class="ArkaSoft.Notepad.UI.Dialogs.EncodingDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="NoResize" ShowInTaskbar="False" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        Width="400" MinHeight="170"
+        MouseLeftButtonDown="Window_DragMove"
+        UseLayoutRounding="True" SnapsToDevicePixels="True">
+    <Border Background="{DynamicResource C.Surface}" CornerRadius="8"
+            BorderBrush="{DynamicResource C.Line}" BorderThickness="1"
+            Margin="16" Padding="24,20,24,20"
+            Effect="{DynamicResource Fx.Popup}">
+        <StackPanel>
+            <TextBlock Text="Choose encoding" FontFamily="{DynamicResource F.Ui}" FontSize="18"
+                       FontWeight="SemiBold" Foreground="{DynamicResource C.Text}" Margin="0,0,0,8"/>
+            <TextBlock Text="The file will be saved with the selected encoding."
+                       FontFamily="{DynamicResource F.Ui}" FontSize="13"
+                       Foreground="{DynamicResource C.Text2}" Margin="0,0,0,12"/>
+            <ComboBox x:Name="EncodingCombo"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                <Button Content="Cancel" MinWidth="100" Click="Cancel_Click"/>
+                <Button Content="Save" MinWidth="100" Margin="8,0,0,0"
+                        Style="{StaticResource Btn.Accent}" Click="Save_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

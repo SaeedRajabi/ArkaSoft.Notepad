@@ -1,0 +1,72 @@
+<UserControl x:Class="ArkaSoft.Notepad.UI.Controls.FindReplacePanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Focusable="False">
+    <Border Background="{DynamicResource C.SurfaceAlt}" CornerRadius="8"
+            BorderBrush="{DynamicResource C.Line}" BorderThickness="1"
+            Effect="{DynamicResource Fx.Popup}" Margin="8"
+            MinWidth="380">
+        <StackPanel Margin="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="&#xE721;" FontFamily="{DynamicResource F.Icons}"
+                           FontSize="11" Foreground="{DynamicResource C.Text2}"
+                           VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBox x:Name="SearchBox" Grid.Column="1" MinWidth="160"
+                         VerticalContentAlignment="Center"
+                         TextChanged="SearchBox_TextChanged"
+                         PreviewKeyDown="SearchBox_PreviewKeyDown"/>
+                <ToggleButton x:Name="CaseToggle" Grid.Column="2" Style="{StaticResource Tgl.Icon}"
+                              Margin="4,0,0,0" ToolTip="Match case"
+                              Checked="CaseToggle_Changed" Unchecked="CaseToggle_Changed"
+                              Content="Aa" TextElement.FontFamily="{DynamicResource F.Ui}"
+                              TextElement.FontSize="11"/>
+                <TextBlock x:Name="MatchCount" Grid.Column="3" Text=""
+                           Foreground="{DynamicResource C.Text2}" FontSize="12"
+                           FontFamily="{DynamicResource F.Ui}"
+                           VerticalAlignment="Center" Margin="8,0,0,0"/>
+                <Button x:Name="PrevButton" Grid.Column="4" Style="{StaticResource Btn.Icon}"
+                        Margin="2,0,0,0" Content="&#xE70E;" ToolTip="Previous match (Shift+Enter)"
+                        Click="PrevButton_Click"/>
+                <Button x:Name="NextButton" Grid.Column="5" Style="{StaticResource Btn.Icon}"
+                        Content="&#xE70D;" ToolTip="Next match (Enter)"
+                        Click="NextButton_Click"/>
+                <ToggleButton x:Name="ReplaceToggle" Grid.Column="6" Style="{StaticResource Tgl.Icon}"
+                        Margin="6,0,0,0" Content="&#xE70D;" FontFamily="{DynamicResource F.Icons}"
+                        ToolTip="Toggle replace" Checked="ReplaceToggle_Changed" Unchecked="ReplaceToggle_Changed"/>
+                <Button x:Name="CloseButton" Grid.Column="7" Style="{StaticResource Btn.Icon}"
+                        Margin="2,0,0,0" Content="&#xE8BB;" ToolTip="Close (Esc)"
+                        Click="CloseButton_Click"/>
+            </Grid>
+            <Grid x:Name="ReplaceRow" Margin="0,8,0,0" Visibility="Collapsed">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="&#xE8B0;" FontFamily="{DynamicResource F.Icons}"
+                           FontSize="11" Foreground="{DynamicResource C.Text2}"
+                           VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBox x:Name="ReplaceBox" Grid.Column="1" MinWidth="160"
+                         VerticalContentAlignment="Center"
+                         PreviewKeyDown="ReplaceBox_PreviewKeyDown"/>
+                <Button x:Name="ReplaceOneButton" Grid.Column="2" Margin="8,0,0,0"
+                        Padding="12,4" MinHeight="28" Content="Replace"
+                        ToolTip="Replace next occurrence" Click="ReplaceOneButton_Click"/>
+                <Button x:Name="ReplaceAllButton" Grid.Column="3" Margin="8,0,0,0"
+                        Padding="12,4" MinHeight="28" Content="Replace all"
+                        Click="ReplaceAllButton_Click"/>
+            </Grid>
+        </StackPanel>
+    </Border>
+</UserControl>

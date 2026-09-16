@@ -1,0 +1,61 @@
+<Window x:Class="ArkaSoft.Notepad.UI.Dialogs.PageSetupDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="NoResize" ShowInTaskbar="False" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        Width="440" MinHeight="200"
+        MouseLeftButtonDown="Window_DragMove"
+        UseLayoutRounding="True" SnapsToDevicePixels="True">
+    <Border Background="{DynamicResource C.Surface}" CornerRadius="8"
+            BorderBrush="{DynamicResource C.Line}" BorderThickness="1"
+            Margin="16" Padding="24,20,24,20"
+            Effect="{DynamicResource Fx.Popup}">
+        <StackPanel>
+            <TextBlock Text="Page setup" FontFamily="{DynamicResource F.Ui}" FontSize="18"
+                       FontWeight="SemiBold" Foreground="{DynamicResource C.Text}" Margin="0,0,0,16"/>
+
+            <TextBlock Text="Paper size" FontFamily="{DynamicResource F.Ui}" FontSize="13"
+                       Foreground="{DynamicResource C.Text2}" Margin="0,0,0,6"/>
+            <ComboBox x:Name="PaperCombo" HorizontalAlignment="Left" Width="220"/>
+
+            <TextBlock Text="Orientation" FontFamily="{DynamicResource F.Ui}" FontSize="13"
+                       Foreground="{DynamicResource C.Text2}" Margin="0,14,0,6"/>
+            <StackPanel Orientation="Horizontal">
+                <RadioButton x:Name="PortraitRadio" GroupName="Orientation" Content="Portrait"
+                             Margin="0,0,24,0" Checked="Orientation_Changed"/>
+                <RadioButton x:Name="LandscapeRadio" GroupName="Orientation" Content="Landscape"/>
+            </StackPanel>
+
+            <TextBlock Text="Margins (mm)" FontFamily="{DynamicResource F.Ui}" FontSize="13"
+                       Foreground="{DynamicResource C.Text2}" Margin="0,14,0,6"/>
+            <UniformGrid Columns="4" Rows="1">
+                <StackPanel Margin="0,0,10,0">
+                    <TextBlock Text="Left" FontSize="12" Foreground="{DynamicResource C.Text2}" Margin="2,0,0,4"/>
+                    <TextBox x:Name="LeftBox" PreviewTextInput="NumberBox_PreviewTextInput"/>
+                </StackPanel>
+                <StackPanel Margin="0,0,10,0">
+                    <TextBlock Text="Top" FontSize="12" Foreground="{DynamicResource C.Text2}" Margin="2,0,0,4"/>
+                    <TextBox x:Name="TopBox" PreviewTextInput="NumberBox_PreviewTextInput"/>
+                </StackPanel>
+                <StackPanel Margin="0,0,10,0">
+                    <TextBlock Text="Right" FontSize="12" Foreground="{DynamicResource C.Text2}" Margin="2,0,0,4"/>
+                    <TextBox x:Name="RightBox" PreviewTextInput="NumberBox_PreviewTextInput"/>
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="Bottom" FontSize="12" Foreground="{DynamicResource C.Text2}" Margin="2,0,0,4"/>
+                    <TextBox x:Name="BottomBox" PreviewTextInput="NumberBox_PreviewTextInput"/>
+                </StackPanel>
+            </UniformGrid>
+
+            <TextBlock x:Name="ErrorText" FontFamily="{DynamicResource F.Ui}" FontSize="12"
+                       Foreground="#E74C3C" Margin="0,10,0,0" Visibility="Collapsed"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                <Button Content="Cancel" MinWidth="100" Click="Cancel_Click"/>
+                <Button Content="OK" MinWidth="100" Margin="8,0,0,0"
+                        Style="{StaticResource Btn.Accent}" Click="Ok_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>
