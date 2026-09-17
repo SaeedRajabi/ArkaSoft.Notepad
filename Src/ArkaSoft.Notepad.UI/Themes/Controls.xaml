@@ -378,7 +378,8 @@
                                           Margin="10,0,26,0" VerticalAlignment="Center"
                                           TextElement.Foreground="{DynamicResource C.Text}"/>
                         <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}"
-                               Placement="Bottom" AllowsTransparency="True" PopupAnimation="Fade"
+                               PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                               Placement="Bottom" AllowsTransparency="True"
                                VerticalOffset="4" Focusable="False">
                             <Border Background="{DynamicResource C.SurfaceAlt}" CornerRadius="6"
                                     BorderBrush="{DynamicResource C.Line}" BorderThickness="1"
@@ -565,7 +566,7 @@
                    IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                    PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                    Placement="Right" VerticalOffset="-8" HorizontalOffset="-4"
-                   AllowsTransparency="True" PopupAnimation="Fade"
+                   AllowsTransparency="True"
                    Focusable="False">
                 <Border Background="{DynamicResource C.SurfaceAlt}" CornerRadius="8"
                         BorderBrush="{DynamicResource C.Line}" BorderThickness="1"
@@ -633,7 +634,7 @@
                    IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                    PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                    Placement="Bottom" VerticalOffset="4" HorizontalOffset="-6"
-                   AllowsTransparency="True" PopupAnimation="Fade"
+                   AllowsTransparency="True"
                    Focusable="False">
                 <Border Background="{DynamicResource C.SurfaceAlt}" CornerRadius="8"
                         BorderBrush="{DynamicResource C.Line}" BorderThickness="1"
@@ -783,7 +784,7 @@
                             <Button x:Name="Close" Grid.Column="1"
                                     Style="{StaticResource Btn.Icon}"
                                     Width="22" Height="22" FontSize="8" Content="&#xE8BB;"
-                                    ToolTip="Close tab (Ctrl+W)"
+                                    ToolTip="{DynamicResource T.CloseTabTip}"
                                     Command="ApplicationCommands.Close"
                                     CommandParameter="{Binding}"/>
                         </Grid>

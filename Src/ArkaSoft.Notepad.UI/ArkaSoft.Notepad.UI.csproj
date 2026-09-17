@@ -15,6 +15,7 @@
   <ItemGroup>
     <Resource Include="Assets\Icons\appLogo.png"/>
     <Resource Include="Assets\Fonts\Vazir.ttf"/>
+    <Content Include="Assets\Fonts\Vazir.ttf" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>
   </ItemGroup>
 
 </Project>

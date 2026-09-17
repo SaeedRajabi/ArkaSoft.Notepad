@@ -26,7 +26,7 @@
                          TextChanged="SearchBox_TextChanged"
                          PreviewKeyDown="SearchBox_PreviewKeyDown"/>
                 <ToggleButton x:Name="CaseToggle" Grid.Column="2" Style="{StaticResource Tgl.Icon}"
-                              Margin="4,0,0,0" ToolTip="Match case"
+                              Margin="4,0,0,0" ToolTip="{DynamicResource T.MatchCase}"
                               Checked="CaseToggle_Changed" Unchecked="CaseToggle_Changed"
                               Content="Aa" TextElement.FontFamily="{DynamicResource F.Ui}"
                               TextElement.FontSize="11"/>
@@ -35,16 +35,16 @@
                            FontFamily="{DynamicResource F.Ui}"
                            VerticalAlignment="Center" Margin="8,0,0,0"/>
                 <Button x:Name="PrevButton" Grid.Column="4" Style="{StaticResource Btn.Icon}"
-                        Margin="2,0,0,0" Content="&#xE70E;" ToolTip="Previous match (Shift+Enter)"
+                        Margin="2,0,0,0" Content="&#xE70E;" ToolTip="{DynamicResource T.PreviousMatch}"
                         Click="PrevButton_Click"/>
                 <Button x:Name="NextButton" Grid.Column="5" Style="{StaticResource Btn.Icon}"
-                        Content="&#xE70D;" ToolTip="Next match (Enter)"
+                        Content="&#xE70D;" ToolTip="{DynamicResource T.NextMatch}"
                         Click="NextButton_Click"/>
                 <ToggleButton x:Name="ReplaceToggle" Grid.Column="6" Style="{StaticResource Tgl.Icon}"
                         Margin="6,0,0,0" Content="&#xE70D;" FontFamily="{DynamicResource F.Icons}"
-                        ToolTip="Toggle replace" Checked="ReplaceToggle_Changed" Unchecked="ReplaceToggle_Changed"/>
+                        ToolTip="{DynamicResource T.ToggleReplace}" Checked="ReplaceToggle_Changed" Unchecked="ReplaceToggle_Changed"/>
                 <Button x:Name="CloseButton" Grid.Column="7" Style="{StaticResource Btn.Icon}"
-                        Margin="2,0,0,0" Content="&#xE8BB;" ToolTip="Close (Esc)"
+                        Margin="2,0,0,0" Content="&#xE8BB;" ToolTip="{DynamicResource T.CloseFind}"
                         Click="CloseButton_Click"/>
             </Grid>
             <Grid x:Name="ReplaceRow" Margin="0,8,0,0" Visibility="Collapsed">
@@ -61,10 +61,10 @@
                          VerticalContentAlignment="Center"
                          PreviewKeyDown="ReplaceBox_PreviewKeyDown"/>
                 <Button x:Name="ReplaceOneButton" Grid.Column="2" Margin="8,0,0,0"
-                        Padding="12,4" MinHeight="28" Content="Replace"
-                        ToolTip="Replace next occurrence" Click="ReplaceOneButton_Click"/>
+                        Padding="12,4" MinHeight="28" Content="{DynamicResource T.Replace}"
+                        ToolTip="{DynamicResource T.Replace}" Click="ReplaceOneButton_Click"/>
                 <Button x:Name="ReplaceAllButton" Grid.Column="3" Margin="8,0,0,0"
-                        Padding="12,4" MinHeight="28" Content="Replace all"
+                        Padding="12,4" MinHeight="28" Content="{DynamicResource T.ReplaceAll}"
                         Click="ReplaceAllButton_Click"/>
             </Grid>
         </StackPanel>

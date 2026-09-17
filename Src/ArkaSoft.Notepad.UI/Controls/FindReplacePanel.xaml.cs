@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using ArkaSoft.Notepad.UI.Services;
 
 namespace ArkaSoft.Notepad.UI.Controls;
 
@@ -49,7 +50,7 @@ public partial class FindReplacePanel : UserControl
 
     public void UpdateCount(int current, int total)
     {
-        var text = total > 0 ? $"{current}/{total}" : "0 results";
+        var text = total > 0 ? $"{current}/{total}" : LocalizationService.Get("NoResults");
         if (text != _lastCountText)
         {
             _lastCountText = text;

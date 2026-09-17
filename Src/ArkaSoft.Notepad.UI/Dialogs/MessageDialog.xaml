@@ -1,6 +1,7 @@
 <Window x:Class="ArkaSoft.Notepad.UI.Dialogs.MessageDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        FontFamily="{DynamicResource F.Ui}" FlowDirection="{DynamicResource Ui.Direction}" Language="{DynamicResource Ui.Language}"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ResizeMode="NoResize" ShowInTaskbar="False" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"

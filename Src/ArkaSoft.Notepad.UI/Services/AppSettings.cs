@@ -42,6 +42,10 @@ public sealed class AppSettings
     public bool WordWrap { get; set; }
     public double ZoomPercent { get; set; } = 100;
     public bool ShowStatusBar { get; set; } = true;
+    public string PersianEditorFont { get; set; } = "Vazir";
+    public string EnglishEditorFont { get; set; } = "Cascadia Mono";
+    public string DisplayFont { get; set; } = "Segoe UI Variable Display";
+    public string InterfaceLanguage { get; set; } = "en";
     public WindowBounds? Window { get; set; }
     public List<string> SessionFiles { get; set; } = new();
     public PrintSettings Print { get; set; } = new();

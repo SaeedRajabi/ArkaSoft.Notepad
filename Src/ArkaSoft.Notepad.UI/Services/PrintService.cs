@@ -189,8 +189,8 @@ public static class PrintService
         }
         catch (Exception ex)
         {
-            Dialogs.MessageDialog.ShowInfo(owner, "Notepad",
-                $"Printing failed:{Environment.NewLine}{ex.Message}");
+            Dialogs.MessageDialog.ShowInfo(owner, LocalizationService.Get("AppName"),
+                LocalizationService.Get("PrintError", ex.Message));
         }
     }
 }

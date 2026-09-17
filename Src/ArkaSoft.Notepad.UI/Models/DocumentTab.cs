@@ -7,6 +7,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using ArkaSoft.Notepad.UI.Helpers;
+using ArkaSoft.Notepad.UI.Services;
 
 namespace ArkaSoft.Notepad.UI.Models;
 
@@ -23,6 +25,8 @@ public sealed class DocumentTab : INotifyPropertyChanged
     public DocumentTab(RichTextBox editor, Encoding encoding, string encodingLabel, string? filePath)
     {
         Editor = editor;
+        TextLayout = new BilingualText(editor);
+        LastText = editor.GetText();
         Encoding = encoding;
         _encodingLabel = encodingLabel;
         _filePath = filePath;
@@ -31,6 +35,8 @@ public sealed class DocumentTab : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public RichTextBox Editor { get; }
+    public BilingualText TextLayout { get; }
+    public string LastText { get; set; }
 
     public Encoding Encoding { get; set; }
 
@@ -52,7 +58,7 @@ public sealed class DocumentTab : INotifyPropertyChanged
     }
 
     public string FileName => FilePath is null
-        ? "Untitled"
+        ? LocalizationService.Get("Untitled")
         : Path.GetFileName(FilePath);
 
     public bool IsDirty
@@ -116,6 +122,12 @@ public sealed class DocumentTab : INotifyPropertyChanged
     }
 
     public void ClearHighlights() => _highlights.Clear();
+
+    public void RefreshTitle()
+    {
+        OnPropertyChanged(nameof(FileName));
+        OnPropertyChanged(nameof(Title));
+    }
 
     private void OnPropertyChanged([CallerMemberName] string? name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

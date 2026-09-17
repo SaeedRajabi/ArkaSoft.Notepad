@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using ArkaSoft.Notepad.UI.Services;
 
 namespace ArkaSoft.Notepad.UI.Dialogs;
 
@@ -49,7 +50,7 @@ public partial class MessageDialog : Window
         {
             var btn = new Button
             {
-                Content = button.Label,
+                Content = LocalizationService.Get(button.Label == "Don't save" ? "DontSave" : button.Label),
                 MinWidth = 110,
                 Margin = new Thickness(8, 0, 0, 0),
                 IsCancel = button.Result == MessageDialogResult.Cancel,

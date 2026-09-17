@@ -12,13 +12,15 @@ public partial class App : Application
 
         var settings = SettingsService.Load();
         ThemeService.Apply((AppTheme)settings.Theme);
+        TypographyService.Apply(settings);
+        LocalizationService.Apply(settings.InterfaceLanguage);
 
         DispatcherUnhandledException += (_, args) =>
         {
             SettingsService.LogError(args.Exception.ToString());
             MessageBox.Show(
-                $"An unexpected error occurred:{Environment.NewLine}{args.Exception.Message}{Environment.NewLine}{Environment.NewLine}Details were written to error.log.",
-                "Notepad", MessageBoxButton.OK, MessageBoxImage.Error);
+                LocalizationService.Get("UnexpectedError", args.Exception.Message),
+                LocalizationService.Get("AppName"), MessageBoxButton.OK, MessageBoxImage.Error);
             args.Handled = true;
         };
 

@@ -1,5 +1,5 @@
 using System.Collections.ObjectModel;
-using System.Reflection;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -16,20 +16,35 @@ using ArkaSoft.Notepad.UI.Helpers;
 using ArkaSoft.Notepad.UI.Models;
 using ArkaSoft.Notepad.UI.Services;
 using Microsoft.Win32;
+using static ArkaSoft.Notepad.UI.Services.LocalizationService;
 
 namespace ArkaSoft.Notepad.UI;
 
 public partial class MainWindow : Window
 {
     private const double BaseEditorFont = 14.0;
-    private const double NoWrapPageWidth = 100000.0;
     private const int WM_SETTINGCHANGE = 0x001C;
 
-    private static readonly HashSet<string> RichEditingCommandNames =
-        typeof(EditingCommands).GetProperties(BindingFlags.Public | BindingFlags.Static)
-            .Where(p => p.PropertyType == typeof(RoutedUICommand))
-            .Select(p => ((RoutedUICommand)p.GetValue(null)!).Name)
-            .ToHashSet();
+    // Keep the editor plain-text-like while preserving normal typing, deletion,
+    // selection and keyboard navigation commands.
+    private static readonly HashSet<string> FormattingCommandNames = new(StringComparer.Ordinal)
+    {
+        EditingCommands.ToggleBold.Name,
+        EditingCommands.ToggleItalic.Name,
+        EditingCommands.ToggleUnderline.Name,
+        EditingCommands.ToggleSubscript.Name,
+        EditingCommands.ToggleSuperscript.Name,
+        EditingCommands.IncreaseFontSize.Name,
+        EditingCommands.DecreaseFontSize.Name,
+        EditingCommands.ToggleBullets.Name,
+        EditingCommands.ToggleNumbering.Name,
+        EditingCommands.AlignLeft.Name,
+        EditingCommands.AlignCenter.Name,
+        EditingCommands.AlignRight.Name,
+        EditingCommands.AlignJustify.Name,
+        EditingCommands.IncreaseIndentation.Name,
+        EditingCommands.DecreaseIndentation.Name
+    };
 
     private readonly AppSettings _settings;
     private readonly ObservableCollection<DocumentTab> _tabs = new();
@@ -66,6 +81,8 @@ public partial class MainWindow : Window
         };
         StateChanged += (_, _) => OnStateChanged();
         ThemeService.EffectiveThemeChanged += OnEffectiveThemeChanged;
+        InputLanguageManager.Current.InputLanguageChanged += InputLanguage_Changed;
+        LocalizationService.Changed += OnLanguageChanged;
     }
 
     // ==================== tab & editor management ====================
@@ -86,22 +103,24 @@ public partial class MainWindow : Window
             }
             catch (Exception ex)
             {
-                MessageDialog.ShowInfo(this, "Notepad",
-                    $"Could not open '{path}':{Environment.NewLine}{ex.Message}");
+                MessageDialog.ShowInfo(this, Get("AppName"), Get("OpenError", path, ex.Message));
                 return null;
             }
         }
 
         _suppressTextEvents = true;
-        var editor = new RichTextBox { BorderThickness = new Thickness(0) };
+        var editor = new RichTextBox { BorderThickness = new Thickness(0), FlowDirection = FlowDirection.LeftToRight };
+        editor.SetResourceReference(Control.BackgroundProperty, "C.Surface");
+        editor.SetResourceReference(Control.ForegroundProperty, "C.Text");
+        editor.SetResourceReference(RichTextBox.CaretBrushProperty, "C.Text");
+        editor.SetResourceReference(RichTextBox.SelectionBrushProperty, "C.Selection");
         editor.Document = CreateDocument(text);
 
-        var tab = new DocumentTab(editor, encoding, encodingLabel, path)
-        {
-            IsRightToLeft = LooksRightToLeft(text)
-        };
+        var tab = new DocumentTab(editor, encoding, encodingLabel, path);
+        tab.TextLayout.InputDirection = BilingualText.DirectionFor(InputLanguageManager.Current.CurrentInputLanguage);
+        RefreshEditorPresentation(tab);
         WireEditor(tab);
-        ApplyReadingDirection(tab);
+        ApplyEditorFont(tab);
 
         _tabs.Add(tab);
         _suppressTextEvents = false;
@@ -114,13 +133,14 @@ public partial class MainWindow : Window
     {
         var doc = new FlowDocument
         {
-            FontFamily = (FontFamily)FindResource("F.Editor"),
+            FlowDirection = FlowDirection.LeftToRight,
             FontSize = BaseEditorFont * _zoomPercent / 100.0,
             PagePadding = new Thickness(10, 8, 10, 8),
             LineHeight = double.NaN
         };
         doc.SetResourceReference(TextElement.ForegroundProperty, "C.Text");
-        ApplyWordWrapTo(doc, _settings.WordWrap);
+        doc.SetResourceReference(TextElement.FontFamilyProperty, "F.Editor");
+        NumberSubstitution.SetSubstitution(doc, NumberSubstitutionMethod.European);
 
         if (text.Length > 0)
             new TextRange(doc.ContentStart, doc.ContentEnd).Text = text;
@@ -134,9 +154,14 @@ public partial class MainWindow : Window
         editor.SelectionChanged += (_, _) =>
         {
             if (ReferenceEquals(_active, tab))
+            {
+                tab.IsRightToLeft = editor.CaretPosition.Paragraph?.FlowDirection == FlowDirection.RightToLeft;
                 UpdateStatus();
+            }
         };
         editor.GotFocus += (_, _) => UpdateStatus();
+        editor.GotFocus += (_, _) => ApplyInputLanguageDirection();
+        editor.SizeChanged += (_, _) => RefreshEditorPresentation(tab);
 
         DataObject.AddPastingHandler(editor, PastePlainTextOnly);
         editor.AddHandler(CommandManager.PreviewCanExecuteEvent,
@@ -156,7 +181,7 @@ public partial class MainWindow : Window
 
     private void BlockRichEditingCommands(object sender, CanExecuteRoutedEventArgs e)
     {
-        if (e.Command is RoutedUICommand command && RichEditingCommandNames.Contains(command.Name))
+        if (e.Command is RoutedUICommand command && FormattingCommandNames.Contains(command.Name))
         {
             e.CanExecute = false;
             e.Handled = true;
@@ -170,9 +195,14 @@ public partial class MainWindow : Window
         MenuItem Mk(string header, ICommand? command = null, RoutedEventHandler? click = null,
             bool checkable = false)
         {
-            var item = new MenuItem { Header = header };
+            var item = new MenuItem();
+            item.SetResourceReference(HeaderedItemsControl.HeaderProperty, "T." + header);
+            item.SetResourceReference(FlowDirectionProperty, "Ui.Direction");
             if (command is not null)
+            {
                 item.Command = command;
+                item.CommandTarget = tab.Editor;
+            }
             if (click is not null)
                 item.Click += click;
             if (checkable)
@@ -187,8 +217,8 @@ public partial class MainWindow : Window
         Mk("Paste", ApplicationCommands.Paste);
         Mk("Delete", ApplicationCommands.Delete);
         menu.Items.Add(new Separator());
-        Mk("Select all", ApplicationCommands.SelectAll);
-        var rtl = Mk("Right-to-left reading direction", click: (_, _) => ToggleReadingDirection(), checkable: true);
+        Mk("SelectAll", ApplicationCommands.SelectAll);
+        var rtl = Mk("RTL", click: (_, _) => ToggleReadingDirection(), checkable: true);
         menu.Items.Add(new Separator());
         Mk("Emoji", click: (_, _) => OpenEmojiPanel());
 
@@ -203,6 +233,11 @@ public partial class MainWindow : Window
     {
         if (_suppressTextEvents)
             return;
+        var text = tab.Editor.GetText();
+        if (text == tab.LastText)
+            return; // Presentation changes must not mark a text file as modified.
+        tab.LastText = text;
+        RefreshEditorPresentation(tab);
         tab.IsDirty = true;
         if (ReferenceEquals(_active, tab))
             UpdateWindowTitle();
@@ -334,7 +369,7 @@ public partial class MainWindow : Window
     {
         var dialog = new OpenFileDialog
         {
-            Filter = "Text documents (*.txt)|*.txt|All files (*.*)|*.*",
+            Filter = Get("FileFilter"),
             Multiselect = true,
             CheckFileExists = true
         };
@@ -360,8 +395,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            MessageDialog.ShowInfo(this, "Notepad",
-                $"Could not save '{tab.FilePath}':{Environment.NewLine}{ex.Message}");
+            MessageDialog.ShowInfo(this, Get("AppName"), Get("SaveError", tab.FilePath!, ex.Message));
             return false;
         }
     }
@@ -370,10 +404,10 @@ public partial class MainWindow : Window
     {
         var dialog = new SaveFileDialog
         {
-            Filter = "Text documents (*.txt)|*.txt|All files (*.*)|*.*",
+            Filter = Get("FileFilter"),
             FileName = tab.FilePath is not null
                 ? System.IO.Path.GetFileName(tab.FilePath)
-                : "Untitled.txt",
+                : Get("Untitled") + ".txt",
             InitialDirectory = tab.FilePath is not null
                 ? System.IO.Path.GetDirectoryName(tab.FilePath)
                 : null
@@ -392,8 +426,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            MessageDialog.ShowInfo(this, "Notepad",
-                $"Could not save '{dialog.FileName}':{Environment.NewLine}{ex.Message}");
+            MessageDialog.ShowInfo(this, Get("AppName"), Get("SaveError", dialog.FileName, ex.Message));
             return false;
         }
 
@@ -412,8 +445,7 @@ public partial class MainWindow : Window
         if (tab.IsDirty)
         {
             DocTabs.SelectedItem = tab;
-            var result = MessageDialog.Show(this, "Notepad",
-                $"Do you want to save changes to:{Environment.NewLine}{tab.FileName}",
+            var result = MessageDialog.Show(this, Get("AppName"), Get("SaveChanges", tab.FileName),
                 MessageDialogButtonSet.SaveDiscardCancel);
             if (result == MessageDialogResult.Cancel)
                 return;
@@ -438,18 +470,17 @@ public partial class MainWindow : Window
     {
         if (tab.FilePath is null)
         {
-            MessageDialog.ShowInfo(this, "Notepad",
-                "Save the file before renaming it.");
+            MessageDialog.ShowInfo(this, Get("AppName"), Get("SaveBeforeRename"));
             return;
         }
 
         var invalid = new string(System.IO.Path.GetInvalidFileNameChars());
-        var newName = InputDialog.Show(this, "Rename", "File name:", tab.FileName, value =>
+        var newName = InputDialog.Show(this, Get("Rename"), Get("FileName"), tab.FileName, value =>
         {
             if (string.IsNullOrWhiteSpace(value))
-                return "Enter a file name.";
+                return Get("EnterFileName");
             if (value.IndexOfAny(invalid.ToCharArray()) >= 0)
-                return $"A file name cannot contain any of these characters: {invalid}";
+                return Get("InvalidFileName", invalid);
             if (!value.Contains('.'))
                 return null;
             return null;
@@ -465,8 +496,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            MessageDialog.ShowInfo(this, "Notepad",
-                $"Could not rename the file:{Environment.NewLine}{ex.Message}");
+            MessageDialog.ShowInfo(this, Get("AppName"), Get("RenameError", ex.Message));
             return;
         }
         tab.FilePath = newPath;
@@ -588,7 +618,7 @@ public partial class MainWindow : Window
         var doc = tab.Editor.Document;
         var whole = new TextRange(doc.ContentStart, doc.ContentEnd);
         whole.ApplyPropertyValue(TextElement.BackgroundProperty, null);
-        whole.ApplyPropertyValue(TextElement.ForegroundProperty, null);
+        whole.ApplyPropertyValue(TextElement.ForegroundProperty, FindResource("C.Text"));
         tab.ClearHighlights();
 
         if (indexes.Length == 0)
@@ -614,7 +644,7 @@ public partial class MainWindow : Window
         var doc = tab.Editor.Document;
         var whole = new TextRange(doc.ContentStart, doc.ContentEnd);
         whole.ApplyPropertyValue(TextElement.BackgroundProperty, null);
-        whole.ApplyPropertyValue(TextElement.ForegroundProperty, null);
+        whole.ApplyPropertyValue(TextElement.ForegroundProperty, FindResource("C.Text"));
         tab.ClearHighlights();
     }
 
@@ -657,12 +687,14 @@ public partial class MainWindow : Window
 
         _suppressTextEvents = true;
         tab.Editor.SetText(replaced);
+        tab.LastText = tab.Editor.GetText();
+        RefreshEditorPresentation(tab);
         _suppressTextEvents = false;
         tab.IsDirty = true;
         UpdateWindowTitle();
         UpdateStatusFor(tab);
         FindPanel.UpdateCount(0, 0);
-        FindPanel.ShowNote($"{count} replaced");
+        FindPanel.ShowNote(Get("Replaced", count));
     }
 
     // ==================== zoom / wrap / reading direction ====================
@@ -675,6 +707,7 @@ public partial class MainWindow : Window
         {
             tab.Editor.FontSize = size;
             tab.Editor.Document.FontSize = size;
+            RefreshEditorPresentation(tab);
         }
         _settings.ZoomPercent = _zoomPercent;
         UpdateZoomLabels();
@@ -683,23 +716,53 @@ public partial class MainWindow : Window
     private void UpdateZoomLabels()
         => ZoomStatus.Content = $"{(int)Math.Round(_zoomPercent)}%";
 
-    private void ApplyWordWrapTo(FlowDocument doc, bool wrap)
-        => doc.PageWidth = wrap ? double.NaN : NoWrapPageWidth;
-
     private void SetWordWrap(bool wrap)
     {
         _settings.WordWrap = wrap;
         WordWrapMenuItem.IsChecked = wrap;
         foreach (var tab in _tabs)
-            ApplyWordWrapTo(tab.Editor.Document, wrap);
+            RefreshEditorPresentation(tab);
         UpdateStatus();
     }
 
-    private void ApplyReadingDirection(DocumentTab tab)
+    private void InputLanguage_Changed(object sender, InputLanguageEventArgs e)
+        => Dispatcher.BeginInvoke(new Action(ApplyInputLanguageDirection));
+
+    private void ApplyInputLanguageDirection()
     {
-        var direction = tab.IsRightToLeft ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
-        tab.Editor.FlowDirection = direction;
-        tab.Editor.Document.FlowDirection = direction;
+        if (_active is null || !_active.Editor.IsKeyboardFocusWithin)
+            return;
+        _active.TextLayout.InputDirection = BilingualText.DirectionFor(InputLanguageManager.Current.CurrentInputLanguage);
+        RefreshEditorPresentation(_active);
+    }
+
+    private void RefreshEditorPresentation(DocumentTab tab)
+    {
+        var suppressed = _suppressTextEvents;
+        _suppressTextEvents = true;
+        try
+        {
+            tab.TextLayout.Refresh();
+            tab.TextLayout.UpdatePageWidth(_settings.WordWrap);
+            tab.IsRightToLeft = tab.Editor.CaretPosition.Paragraph?.FlowDirection == FlowDirection.RightToLeft;
+        }
+        finally { _suppressTextEvents = suppressed; }
+    }
+
+    private void ApplyEditorFont(DocumentTab tab)
+    {
+        tab.Editor.SetResourceReference(Control.FontFamilyProperty, "F.Editor");
+        tab.Editor.Document.SetResourceReference(TextElement.FontFamilyProperty, "F.Editor");
+    }
+
+    private void ApplyTypographySettings()
+    {
+        TypographyService.Apply(_settings);
+        foreach (var tab in _tabs)
+        {
+            ApplyEditorFont(tab);
+            RefreshEditorPresentation(tab);
+        }
     }
 
     private void ToggleReadingDirection()
@@ -707,22 +770,8 @@ public partial class MainWindow : Window
         if (_active is null)
             return;
         _active.IsRightToLeft = !_active.IsRightToLeft;
-        ApplyReadingDirection(_active);
+        _active.TextLayout.SetSelectionDirection(_active.IsRightToLeft ? FlowDirection.RightToLeft : FlowDirection.LeftToRight);
         FocusActiveEditor();
-    }
-
-    private static bool LooksRightToLeft(string text)
-    {
-        var limit = Math.Min(text.Length, 500);
-        for (int i = 0; i < limit; i++)
-        {
-            var c = text[i];
-            if (c is >= '\u0590' and <= '\u05FF' or >= '\u0600' and <= '\u06FF' or >= '\u0700' and <= '\u074F')
-                return true;
-            if (char.IsLetter(c))
-                return false;
-        }
-        return false;
     }
 
     private void OpenEmojiPanel()
@@ -750,8 +799,18 @@ public partial class MainWindow : Window
 
     private void UpdateWindowTitle()
         => Title = _active is null
-            ? "Notepad"
-            : $"{(_active.IsDirty ? "*" : string.Empty)}{_active.FileName} - Notepad";
+            ? Get("AppName")
+            : $"{(_active.IsDirty ? "*" : string.Empty)}{_active.FileName} - {Get("AppName")}";
+
+    private void OnLanguageChanged()
+    {
+        foreach (var tab in _tabs)
+            tab.RefreshTitle();
+        UpdateWindowTitle();
+        UpdateStatus();
+        if (FindPanel.Visibility == Visibility.Visible)
+            RefreshFindHighlights();
+    }
 
     private void UpdateStatus() => UpdateStatusFor(_active);
 
@@ -759,10 +818,10 @@ public partial class MainWindow : Window
     {
         if (tab is null)
         {
-            LnText.Text = "Ln 1";
-            ColText.Text = ", Col 1";
-            LinesText.Text = "1 line";
-            CharsText.Text = "0 characters";
+            LnText.Text = Get("Line", 1);
+            ColText.Text = Get("Column", 1);
+            LinesText.Text = Get("OneLine");
+            CharsText.Text = Get("Characters", 0);
             EncodingText.Text = "UTF-8";
             return;
         }
@@ -772,8 +831,8 @@ public partial class MainWindow : Window
         var chars = text.Replace("\r\n", "\n").Length;
         var lines = RichTextHelper.CountLines(editor);
 
-        LinesText.Text = lines == 1 ? "1 line" : $"{lines} lines";
-        CharsText.Text = chars == 1 ? "1 character" : $"{chars} characters";
+        LinesText.Text = lines == 1 ? Get("OneLine") : Get("Lines", lines);
+        CharsText.Text = chars == 1 ? Get("OneCharacter") : Get("Characters", chars);
         EncodingText.Text = tab.EncodingLabel;
 
         if (_settings.WordWrap)
@@ -784,8 +843,8 @@ public partial class MainWindow : Window
         {
             LnColPanel.Visibility = Visibility.Visible;
             var (line, column) = RichTextHelper.GetLineColumn(editor);
-            LnText.Text = $"Ln {line}";
-            ColText.Text = $", Col {column}";
+            LnText.Text = Get("Line", line);
+            ColText.Text = Get("Column", column);
         }
         UpdateZoomLabels();
     }
@@ -803,6 +862,8 @@ public partial class MainWindow : Window
 
     private void ApplyStartupSettings(AppSettings settings)
     {
+        ApplyTypographySettings();
+        LocalizationService.Apply(settings.InterfaceLanguage);
         _zoomPercent = Math.Clamp(settings.ZoomPercent, 10, 500);
         UpdateZoomLabels();
         WordWrapMenuItem.IsChecked = settings.WordWrap;
@@ -837,7 +898,7 @@ public partial class MainWindow : Window
     private void PersistSettings()
     {
         _settings.WordWrap = WordWrapMenuItem.IsChecked;
-        _settings.ShowStatusBar = StatusBarMenuItem.Visibility == Visibility.Visible;
+        _settings.ShowStatusBar = StatusBarMenuItem.IsChecked;
         _settings.ZoomPercent = _zoomPercent;
         _settings.SessionFiles = _tabs
             .Where(t => t.FilePath is not null)
@@ -879,6 +940,10 @@ public partial class MainWindow : Window
     {
         Dispatcher.BeginInvoke(() =>
         {
+            ApplyTypographySettings();
+            foreach (var tab in _tabs)
+                ClearTabHighlights(tab);
+
             if (_active is not null && FindPanel.Visibility == Visibility.Visible && _lastFindTerm.Length > 0)
                 RefreshFindHighlights();
         });
@@ -992,16 +1057,15 @@ public partial class MainWindow : Window
             return;
         if (_settings.WordWrap)
         {
-            MessageDialog.ShowInfo(this, "Notepad",
-                "Go To is unavailable when word wrap is enabled.");
+            MessageDialog.ShowInfo(this, Get("AppName"), Get("GoToUnavailable"));
             return;
         }
 
         var totalLines = RichTextHelper.CountLines(tab.Editor);
-        var input = InputDialog.Show(this, "Go to", $"Line number (1 - {totalLines}):", "1", value =>
+        var input = InputDialog.Show(this, Get("GoTo"), Get("LineNumber", totalLines), "1", value =>
         {
             if (!int.TryParse(value, out var line) || line < 1 || line > totalLines)
-                return $"Enter a line number between 1 and {totalLines}.";
+                return Get("InvalidLine", totalLines);
             return null;
         });
         if (input is null || !int.TryParse(input, out var target) || target < 1)
@@ -1051,6 +1115,17 @@ public partial class MainWindow : Window
         var visible = StatusBarMenuItem.IsChecked;
         StatusBar.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
         _settings.ShowStatusBar = visible;
+    }
+
+    private void FontSettings_Executed(object sender, ExecutedRoutedEventArgs e)
+    {
+        if (!FontSettingsDialog.Show(this, _settings))
+            return;
+
+        ApplyTypographySettings();
+        LocalizationService.Apply(_settings.InterfaceLanguage);
+        SettingsService.Save(_settings);
+        FocusActiveEditor();
     }
 
     private void ThemeSystem_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -1152,8 +1227,7 @@ public partial class MainWindow : Window
         foreach (var tab in _tabs.Where(t => t.IsDirty).ToList())
         {
             DocTabs.SelectedItem = tab;
-            var result = MessageDialog.Show(this, "Notepad",
-                $"Do you want to save changes to:{Environment.NewLine}{tab.FileName}",
+            var result = MessageDialog.Show(this, Get("AppName"), Get("SaveChanges", tab.FileName),
                 MessageDialogButtonSet.SaveDiscardCancel);
             if (result == MessageDialogResult.Cancel)
             {
@@ -1172,6 +1246,8 @@ public partial class MainWindow : Window
     private void Window_Closed(object sender, EventArgs e)
     {
         ThemeService.EffectiveThemeChanged -= OnEffectiveThemeChanged;
+        InputLanguageManager.Current.InputLanguageChanged -= InputLanguage_Changed;
+        LocalizationService.Changed -= OnLanguageChanged;
         PersistSettings();
     }
 }

@@ -76,6 +76,9 @@ public static class AppCommands
     public static readonly RoutedUICommand ToggleStatusBar = new(
         "Status bar", "ToggleStatusBar", typeof(AppCommands));
 
+    public static readonly RoutedUICommand FontSettings = new(
+        "Font settings", "FontSettings", typeof(AppCommands));
+
     public static readonly RoutedUICommand SetThemeSystem = new("Use system setting", "SetThemeSystem", typeof(AppCommands));
     public static readonly RoutedUICommand SetThemeLight = new("Light", "SetThemeLight", typeof(AppCommands));
     public static readonly RoutedUICommand SetThemeDark = new("Dark", "SetThemeDark", typeof(AppCommands));

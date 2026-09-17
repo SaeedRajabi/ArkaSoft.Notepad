@@ -64,7 +64,7 @@ public partial class PageSetupDialog : Window
         {
             if (!double.TryParse(box.Text, out var value) || value < 0 || value > 50)
             {
-                ErrorText.Text = "Margins must be numbers between 0 and 50 millimeters.";
+                ErrorText.Text = LocalizationService.Get("InvalidMargins");
                 ErrorText.Visibility = Visibility.Visible;
                 return;
             }

@@ -2,5 +2,7 @@
   <Folder Name="/Src/">
     <Project Path="Src/ArkaSoft.Notepad.UI/ArkaSoft.Notepad.UI.csproj" />
   </Folder>
-  <Folder Name="/Test/" />
+  <Folder Name="/Test/">
+    <Project Path="Test/ArkaSoft.Notepad.Checks/ArkaSoft.Notepad.Checks.csproj" />
+  </Folder>
 </Solution>

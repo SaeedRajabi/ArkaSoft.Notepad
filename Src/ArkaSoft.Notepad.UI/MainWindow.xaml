@@ -7,6 +7,7 @@
         Width="940" Height="640" MinWidth="500" MinHeight="360"
         Background="{DynamicResource C.Window}"
         FontFamily="{DynamicResource F.Ui}"
+        FlowDirection="{DynamicResource Ui.Direction}" Language="{DynamicResource Ui.Language}"
         UseLayoutRounding="True" SnapsToDevicePixels="True"
         AllowDrop="True"
         TextOptions.TextFormattingMode="Display"
@@ -56,6 +57,7 @@
         <CommandBinding Command="{x:Static cmd:AppCommands.ZoomReset}" Executed="ZoomReset_Executed"/>
         <CommandBinding Command="{x:Static cmd:AppCommands.ToggleWordWrap}" Executed="WordWrap_Executed"/>
         <CommandBinding Command="{x:Static cmd:AppCommands.ToggleStatusBar}" Executed="StatusBar_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.FontSettings}" Executed="FontSettings_Executed"/>
         <CommandBinding Command="{x:Static cmd:AppCommands.SetThemeSystem}" Executed="ThemeSystem_Executed"/>
         <CommandBinding Command="{x:Static cmd:AppCommands.SetThemeLight}" Executed="ThemeLight_Executed"/>
         <CommandBinding Command="{x:Static cmd:AppCommands.SetThemeDark}" Executed="ThemeDark_Executed"/>
@@ -72,7 +74,7 @@
         </Grid.RowDefinitions>
 
         <!-- ============ Title bar with tabs ============ -->
-        <Grid Grid.Row="0" Background="Transparent">
+        <Grid Grid.Row="0" Background="Transparent" FlowDirection="LeftToRight">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -87,7 +89,7 @@
                    WindowChrome.IsHitTestVisibleInChrome="True"
                    MouseLeftButtonDown="AppIcon_MouseLeftButtonDown"
                    MouseLeftButtonUp="AppIcon_MouseLeftButtonUp"
-                   ToolTip="Notepad"/>
+                   ToolTip="{DynamicResource T.AppName}"/>
 
             <TabControl Grid.Column="1" x:Name="DocTabs"
                         Style="{StaticResource TitleTabs}"
@@ -99,81 +101,81 @@
 
             <Button Grid.Column="2" x:Name="NewTabButton"
                     Style="{StaticResource Btn.Icon}" Width="30" Height="30"
-                    Content="&#xE710;" FontSize="11" ToolTip="New tab (Ctrl+T)"
+                    Content="&#xE710;" FontSize="11" ToolTip="{DynamicResource T.NewTabTip}"
                     WindowChrome.IsHitTestVisibleInChrome="True"
                     Command="{x:Static cmd:AppCommands.NewTab}"/>
 
             <StackPanel Grid.Column="4" Orientation="Horizontal"
                         WindowChrome.IsHitTestVisibleInChrome="True">
                 <Button x:Name="MinimizeButton" Style="{StaticResource WBtn}" Content="&#xE921;"
-                        ToolTip="Minimize" Click="MinimizeButton_Click"/>
+                        ToolTip="{DynamicResource T.Minimize}" Click="MinimizeButton_Click"/>
                 <Button x:Name="MaximizeButton" Style="{StaticResource WBtn}" Content="&#xE922;"
-                        ToolTip="Maximize" Click="MaximizeButton_Click"/>
+                        ToolTip="{DynamicResource T.Maximize}" Click="MaximizeButton_Click"/>
                 <Button x:Name="CloseButton" Style="{StaticResource WBtn.Close}"
-                        ToolTip="Close" Click="CloseButton_Click"/>
+                        ToolTip="{DynamicResource T.Close}" Click="CloseButton_Click"/>
             </StackPanel>
         </Grid>
 
         <!-- ============ Menu bar ============ -->
         <Menu Grid.Row="1" Margin="8,0,0,0">
-            <MenuItem Header="_File">
-                <MenuItem Header="_New tab" Command="{x:Static cmd:AppCommands.NewTab}">
+            <MenuItem Header="{DynamicResource T.File}">
+                <MenuItem Header="{DynamicResource T.NewTab}" Command="{x:Static cmd:AppCommands.NewTab}">
                     <MenuItem.Icon>
                         <TextBlock Text="&#xE7C3;" FontFamily="{DynamicResource F.Icons}" FontSize="14"
                                    Foreground="{DynamicResource C.Text2}"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="New _window" Command="{x:Static cmd:AppCommands.NewWindow}"/>
-                <MenuItem Header="_Open..." Command="{x:Static cmd:AppCommands.Open}">
+                <MenuItem Header="{DynamicResource T.NewWindow}" Command="{x:Static cmd:AppCommands.NewWindow}"/>
+                <MenuItem Header="{DynamicResource T.Open}" Command="{x:Static cmd:AppCommands.Open}">
                     <MenuItem.Icon>
                         <TextBlock Text="&#xE8E5;" FontFamily="{DynamicResource F.Icons}" FontSize="14"
                                    Foreground="{DynamicResource C.Text2}"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Header="_Save" Command="{x:Static cmd:AppCommands.Save}">
+                <MenuItem Header="{DynamicResource T.Save}" Command="{x:Static cmd:AppCommands.Save}">
                     <MenuItem.Icon>
                         <TextBlock Text="&#xE74E;" FontFamily="{DynamicResource F.Icons}" FontSize="14"
                                    Foreground="{DynamicResource C.Text2}"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Save _as..." Command="{x:Static cmd:AppCommands.SaveAs}"/>
-                <MenuItem Header="_Rename" Command="{x:Static cmd:AppCommands.Rename}"
+                <MenuItem Header="{DynamicResource T.SaveAs}" Command="{x:Static cmd:AppCommands.SaveAs}"/>
+                <MenuItem Header="{DynamicResource T.Rename}" Command="{x:Static cmd:AppCommands.Rename}"
                           x:Name="RenameMenuItem"/>
                 <Separator/>
-                <MenuItem Header="Page set_up" Command="{x:Static cmd:AppCommands.PageSetup}"/>
-                <MenuItem Header="_Print" Command="{x:Static cmd:AppCommands.Print}">
+                <MenuItem Header="{DynamicResource T.PageSetup}" Command="{x:Static cmd:AppCommands.PageSetup}"/>
+                <MenuItem Header="{DynamicResource T.Print}" Command="{x:Static cmd:AppCommands.Print}">
                     <MenuItem.Icon>
                         <TextBlock Text="&#xE749;" FontFamily="{DynamicResource F.Icons}" FontSize="14"
                                    Foreground="{DynamicResource C.Text2}"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Header="E_xit" Command="{x:Static cmd:AppCommands.Exit}"/>
+                <MenuItem Header="{DynamicResource T.Exit}" Command="{x:Static cmd:AppCommands.Exit}"/>
             </MenuItem>
 
-            <MenuItem Header="_Edit">
-                <MenuItem Header="_Undo" Command="ApplicationCommands.Undo"/>
-                <MenuItem Header="_Redo" Command="ApplicationCommands.Redo"/>
+            <MenuItem Header="{DynamicResource T.Edit}">
+                <MenuItem Header="{DynamicResource T.Undo}" Command="ApplicationCommands.Undo"/>
+                <MenuItem Header="{DynamicResource T.Redo}" Command="ApplicationCommands.Redo"/>
                 <Separator/>
-                <MenuItem Header="Cu_t" Command="ApplicationCommands.Cut"/>
-                <MenuItem Header="_Copy" Command="ApplicationCommands.Copy"/>
-                <MenuItem Header="_Paste" Command="ApplicationCommands.Paste"/>
-                <MenuItem Header="De_lete" Command="ApplicationCommands.Delete"/>
+                <MenuItem Header="{DynamicResource T.Cut}" Command="ApplicationCommands.Cut"/>
+                <MenuItem Header="{DynamicResource T.Copy}" Command="ApplicationCommands.Copy"/>
+                <MenuItem Header="{DynamicResource T.Paste}" Command="ApplicationCommands.Paste"/>
+                <MenuItem Header="{DynamicResource T.Delete}" Command="ApplicationCommands.Delete"/>
                 <Separator/>
-                <MenuItem Header="_Find" Command="{x:Static cmd:AppCommands.Find}">
+                <MenuItem Header="{DynamicResource T.Find}" Command="{x:Static cmd:AppCommands.Find}">
                     <MenuItem.Icon>
                         <TextBlock Text="&#xE721;" FontFamily="{DynamicResource F.Icons}" FontSize="14"
                                    Foreground="{DynamicResource C.Text2}"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Find _next" Command="{x:Static cmd:AppCommands.FindNext}"/>
-                <MenuItem Header="Find pre_vious" Command="{x:Static cmd:AppCommands.FindPrevious}"/>
-                <MenuItem Header="_Replace" Command="{x:Static cmd:AppCommands.Replace}"/>
-                <MenuItem Header="_Go to" Command="{x:Static cmd:AppCommands.GoTo}"/>
+                <MenuItem Header="{DynamicResource T.FindNext}" Command="{x:Static cmd:AppCommands.FindNext}"/>
+                <MenuItem Header="{DynamicResource T.FindPrevious}" Command="{x:Static cmd:AppCommands.FindPrevious}"/>
+                <MenuItem Header="{DynamicResource T.Replace}" Command="{x:Static cmd:AppCommands.Replace}"/>
+                <MenuItem Header="{DynamicResource T.GoTo}" Command="{x:Static cmd:AppCommands.GoTo}"/>
                 <Separator/>
-                <MenuItem Header="Select _all" Command="ApplicationCommands.SelectAll"/>
-                <MenuItem Header="Time/_date" Command="{x:Static cmd:AppCommands.InsertTimeDate}">
+                <MenuItem Header="{DynamicResource T.SelectAll}" Command="ApplicationCommands.SelectAll"/>
+                <MenuItem Header="{DynamicResource T.TimeDate}" Command="{x:Static cmd:AppCommands.InsertTimeDate}">
                     <MenuItem.Icon>
                         <TextBlock Text="&#xE823;" FontFamily="{DynamicResource F.Icons}" FontSize="14"
                                    Foreground="{DynamicResource C.Text2}"/>
@@ -181,30 +183,31 @@
                 </MenuItem>
             </MenuItem>
 
-            <MenuItem Header="_View">
-                <MenuItem Header="Zoom">
-                    <MenuItem Header="Zoom _in" Command="{x:Static cmd:AppCommands.ZoomIn}"
+            <MenuItem Header="{DynamicResource T.View}">
+                <MenuItem Header="{DynamicResource T.Zoom}">
+                    <MenuItem Header="{DynamicResource T.ZoomIn}" Command="{x:Static cmd:AppCommands.ZoomIn}"
                               InputGestureText="Ctrl + Plus"/>
-                    <MenuItem Header="Zoom _out" Command="{x:Static cmd:AppCommands.ZoomOut}"
+                    <MenuItem Header="{DynamicResource T.ZoomOut}" Command="{x:Static cmd:AppCommands.ZoomOut}"
                               InputGestureText="Ctrl + Minus"/>
-                    <MenuItem Header="_Restore default zoom" Command="{x:Static cmd:AppCommands.ZoomReset}"
+                    <MenuItem Header="{DynamicResource T.ZoomReset}" Command="{x:Static cmd:AppCommands.ZoomReset}"
                               InputGestureText="Ctrl + 0"/>
                 </MenuItem>
-                <MenuItem Header="_Word wrap" x:Name="WordWrapMenuItem"
+                <MenuItem Header="{DynamicResource T.WordWrap}" x:Name="WordWrapMenuItem"
                           Command="{x:Static cmd:AppCommands.ToggleWordWrap}"
                           IsCheckable="True"/>
-                <MenuItem Header="_Status bar" x:Name="StatusBarMenuItem"
+                <MenuItem Header="{DynamicResource T.StatusBar}" x:Name="StatusBarMenuItem"
                           Command="{x:Static cmd:AppCommands.ToggleStatusBar}"
                           IsCheckable="True" IsChecked="True"/>
+                <MenuItem Header="{DynamicResource T.Fonts}" Command="{x:Static cmd:AppCommands.FontSettings}"/>
                 <Separator/>
-                <MenuItem Header="App theme">
-                    <MenuItem Header="Use system setting" x:Name="ThemeSystemMenuItem"
+                <MenuItem Header="{DynamicResource T.Theme}">
+                    <MenuItem Header="{DynamicResource T.System}" x:Name="ThemeSystemMenuItem"
                               Command="{x:Static cmd:AppCommands.SetThemeSystem}"
                               IsCheckable="True"/>
-                    <MenuItem Header="Light" x:Name="ThemeLightMenuItem"
+                    <MenuItem Header="{DynamicResource T.Light}" x:Name="ThemeLightMenuItem"
                               Command="{x:Static cmd:AppCommands.SetThemeLight}"
                               IsCheckable="True"/>
-                    <MenuItem Header="Dark" x:Name="ThemeDarkMenuItem"
+                    <MenuItem Header="{DynamicResource T.Dark}" x:Name="ThemeDarkMenuItem"
                               Command="{x:Static cmd:AppCommands.SetThemeDark}"
                               IsCheckable="True"/>
                 </MenuItem>
@@ -213,7 +216,7 @@
 
         <!-- ============ Editor area ============ -->
         <Grid Grid.Row="2">
-            <ContentPresenter x:Name="EditorHost"/>
+            <ContentPresenter x:Name="EditorHost" FlowDirection="LeftToRight"/>
             <controls:FindReplacePanel x:Name="FindPanel"
                                        HorizontalAlignment="Right"
                                        VerticalAlignment="Top"
@@ -248,15 +251,15 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                     <Button x:Name="ZoomOutStatus" Style="{StaticResource Btn.Icon}"
                             Width="26" Height="24" FontSize="14" FontFamily="Segoe UI"
-                            Content="−" ToolTip="Zoom out (Ctrl + Minus)"
+                            Content="−" ToolTip="{DynamicResource T.ZoomOut}"
                             Command="{x:Static cmd:AppCommands.ZoomOut}"/>
                     <Button x:Name="ZoomStatus" Style="{StaticResource Btn.Icon}"
                             Width="52" Height="24" FontFamily="{DynamicResource F.Ui}"
-                            FontSize="12" Content="100%" ToolTip="Restore default zoom (Ctrl + 0)"
+                            FontSize="12" Content="100%" ToolTip="{DynamicResource T.ZoomReset}"
                             Command="{x:Static cmd:AppCommands.ZoomReset}"/>
                     <Button x:Name="ZoomInStatus" Style="{StaticResource Btn.Icon}"
                             Width="26" Height="24" FontSize="14" FontFamily="Segoe UI"
-                            Content="+" ToolTip="Zoom in (Ctrl + Plus)"
+                            Content="+" ToolTip="{DynamicResource T.ZoomIn}"
                             Command="{x:Static cmd:AppCommands.ZoomIn}"/>
                 </StackPanel>
 
