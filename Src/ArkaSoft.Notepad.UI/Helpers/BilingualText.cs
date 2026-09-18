@@ -55,11 +55,11 @@ public sealed class BilingualText
                 var empty = string.IsNullOrWhiteSpace(text);
                 var known = _paragraphs.TryGetValue(paragraph, out var state);
                 state ??= _paragraphs.GetOrCreateValue(paragraph);
+                if (known && empty && !state.WasEmpty)
+                    state.Manual = false;
                 if (!state.Manual && (!known || empty || state.WasEmpty))
                     SetDirection(paragraph, empty ? InputDirection : DetectDirection(text) ?? InputDirection);
                 state.WasEmpty = empty;
-                if (empty)
-                    state.Manual = false;
             }
         }
         finally { _updating = false; }

@@ -5,8 +5,8 @@ namespace ArkaSoft.Notepad.UI.Services;
 
 public static class ThemeService
 {
-    private const string PaletteLightUri = "Themes/Palette.Light.xaml";
-    private const string PaletteDarkUri = "Themes/Palette.Dark.xaml";
+    private const string PaletteLightUri = "/ArkaSoft.Notepad;component/Themes/Palette.Light.xaml";
+    private const string PaletteDarkUri = "/ArkaSoft.Notepad;component/Themes/Palette.Dark.xaml";
 
     /// <summary>Raised whenever the effective (resolved) theme changes,
     /// including when the Windows system theme changes.</summary>
