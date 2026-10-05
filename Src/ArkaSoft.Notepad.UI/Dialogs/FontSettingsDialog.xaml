@@ -31,7 +31,7 @@
                 <Border Background="{DynamicResource C.Control}" CornerRadius="4" Margin="0,14,0,0" Padding="12,8">
                     <StackPanel>
                         <TextBlock x:Name="PersianPreview" Text="سلام، فایل Report.txt آماده است (۱۲۳)."
-                                   FlowDirection="RightToLeft" TextAlignment="Right" FontSize="17" TextWrapping="Wrap"/>
+                                   FlowDirection="RightToLeft" TextAlignment="Left" FontSize="17" TextWrapping="Wrap"/>
                         <TextBlock x:Name="EnglishPreview" Text="Hello — سلام! Version 2.0 (2026)."
                                    FlowDirection="LeftToRight" TextAlignment="Left" FontSize="16" Margin="0,6,0,0" TextWrapping="Wrap"/>
                         <TextBlock x:Name="DisplayPreview" Text="{DynamicResource T.DisplayPreview}"

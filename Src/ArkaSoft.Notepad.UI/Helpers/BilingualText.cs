@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -7,24 +6,38 @@ using System.Windows.Media;
 
 namespace ArkaSoft.Notepad.UI.Helpers;
 
+/// <summary>
+/// How paragraph directions are decided for one editor.
+/// </summary>
+public enum TextDirectionMode
+{
+    /// <summary>Auto: each paragraph follows its content; empty paragraphs
+    /// follow the active keyboard language. Persian sticks right, English
+    /// sticks left, and switching language mid-sentence changes nothing.</summary>
+    Normal,
+
+    /// <summary>Everything is right-to-left, regardless of content.</summary>
+    Rtl,
+
+    /// <summary>Everything is left-to-right, regardless of content.</summary>
+    Ltr
+}
+
 /// <summary>Presentation only: never reorder text or insert bidi control characters.</summary>
 public sealed class BilingualText
 {
-    private sealed class ParagraphState
-    {
-        public bool WasEmpty { get; set; }
-        public bool Manual { get; set; }
-    }
-
-    private readonly ConditionalWeakTable<Paragraph, ParagraphState> _paragraphs = new();
-    private static readonly Style LeftParagraph = CreateParagraphStyle(FlowDirection.LeftToRight);
-    private static readonly Style RightParagraph = CreateParagraphStyle(FlowDirection.RightToLeft);
     private readonly RichTextBox _editor;
     private bool _updating;
 
     public BilingualText(RichTextBox editor) => _editor = editor;
 
+    /// <summary>The direction an EMPTY paragraph takes in Normal mode
+    /// (driven by the active keyboard language).</summary>
     public FlowDirection InputDirection { get; set; } = FlowDirection.LeftToRight;
+
+    public TextDirectionMode Mode { get; set; } = TextDirectionMode.Normal;
+
+    public bool IsPinned => Mode != TextDirectionMode.Normal;
 
     public static FlowDirection DirectionFor(CultureInfo culture)
         => culture.TextInfo.IsRightToLeft ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
@@ -42,6 +55,13 @@ public sealed class BilingualText
         return null;
     }
 
+    /// <summary>Font used by right-to-left (Persian) paragraphs; set from
+    /// TypographyService. Null leaves the document font untouched.</summary>
+    public FontFamily? PersianFont { get; set; }
+
+    /// <summary>Font used by left-to-right (English) paragraphs.</summary>
+    public FontFamily? EnglishFont { get; set; }
+
     public void Refresh()
     {
         if (_updating)
@@ -53,62 +73,107 @@ public sealed class BilingualText
             {
                 var text = new TextRange(paragraph.ContentStart, paragraph.ContentEnd).Text;
                 var empty = string.IsNullOrWhiteSpace(text);
-                var known = _paragraphs.TryGetValue(paragraph, out var state);
-                state ??= _paragraphs.GetOrCreateValue(paragraph);
-                if (known && empty && !state.WasEmpty)
-                    state.Manual = false;
-                if (!state.Manual && (!known || empty || state.WasEmpty))
-                    SetDirection(paragraph, empty ? InputDirection : DetectDirection(text) ?? InputDirection);
-                state.WasEmpty = empty;
+
+                FlowDirection direction = Mode switch
+                {
+                    TextDirectionMode.Rtl => FlowDirection.RightToLeft,
+                    TextDirectionMode.Ltr => FlowDirection.LeftToRight,
+                    _ => empty ? InputDirection : DetectDirection(text) ?? InputDirection
+                };
+
+                ApplyDirection(paragraph, direction, PersianFont, EnglishFont);
             }
         }
         finally { _updating = false; }
     }
 
-    public void SetSelectionDirection(FlowDirection direction)
+    /// <summary>Pins the whole document to one direction (RTL/LTR modes).</summary>
+    public void SetDocumentDirection(FlowDirection direction)
     {
-        foreach (var paragraph in _editor.Document.Blocks.OfType<Paragraph>())
-        {
-            if (paragraph.ContentEnd.CompareTo(_editor.Selection.Start) < 0 ||
-                paragraph.ContentStart.CompareTo(_editor.Selection.End) > 0)
-                continue;
-            SetDirection(paragraph, direction);
-            _paragraphs.GetOrCreateValue(paragraph).Manual = true;
-        }
+        Mode = direction == FlowDirection.RightToLeft ? TextDirectionMode.Rtl : TextDirectionMode.Ltr;
+        InputDirection = direction;
     }
 
-    private static void SetDirection(Paragraph paragraph, FlowDirection direction)
+    /// <summary>Returns to content-driven direction (the Normal mode).</summary>
+    public void ResetToNormal()
     {
-        // WPF copies effective formatting into local values on Enter/paste.
-        // Remove those snapshots so this paragraph's presentation style wins.
-        if (paragraph.ReadLocalValue(Block.FlowDirectionProperty) != DependencyProperty.UnsetValue)
-            paragraph.ClearValue(Block.FlowDirectionProperty);
-        if (paragraph.ReadLocalValue(Block.TextAlignmentProperty) != DependencyProperty.UnsetValue)
-            paragraph.ClearValue(Block.TextAlignmentProperty);
-        if (paragraph.ReadLocalValue(Block.MarginProperty) != DependencyProperty.UnsetValue)
-            paragraph.ClearValue(Block.MarginProperty);
-        var style = direction == FlowDirection.RightToLeft ? RightParagraph : LeftParagraph;
-        if (!ReferenceEquals(paragraph.Style, style))
-            paragraph.Style = style;
+        Mode = TextDirectionMode.Normal;
     }
 
-    private static Style CreateParagraphStyle(FlowDirection direction)
+    /// <summary>
+    /// Gives the paragraph at the caret the given direction, but ONLY while it
+    /// is empty — so a paragraph picks up the typing language at its start and
+    /// then KEEPS that direction when the language switches mid-sentence. This
+    /// is what prevents the left/right flip and font jump inside a sentence.
+    /// In forced RTL/LTR modes this is a no-op; Refresh pins every paragraph.
+    /// </summary>
+    public void ApplyInputDirectionToEmptyCaretParagraph(FlowDirection direction)
     {
-        // Style values affect layout without creating formatting undo records.
-        var style = new Style(typeof(Paragraph));
-        style.Setters.Add(new Setter(Block.FlowDirectionProperty, direction));
-        style.Setters.Add(new Setter(Block.TextAlignmentProperty,
-            direction == FlowDirection.RightToLeft ? TextAlignment.Right : TextAlignment.Left));
-        style.Setters.Add(new Setter(Block.MarginProperty, new Thickness(0)));
-        style.Seal();
-        return style;
+        if (Mode != TextDirectionMode.Normal)
+            return;
+
+        var paragraph = _editor.CaretPosition.Paragraph;
+        if (paragraph is null)
+            return;
+
+        var text = new TextRange(paragraph.ContentStart, paragraph.ContentEnd).Text;
+        if (!string.IsNullOrWhiteSpace(text))
+            return;
+
+        SetDirection(paragraph, direction);
+
+        // ContentStart is the logical beginning; in an RTL paragraph it is
+        // rendered at the right edge, and in an LTR paragraph at the left edge.
+        _editor.Selection.Select(paragraph.ContentStart, paragraph.ContentStart);
+        _editor.CaretPosition = paragraph.ContentStart;
+    }
+
+    /// <summary>
+    /// TextAlignment is flow-relative in WPF: on a paragraph whose FlowDirection
+    /// is RightToLeft, the start edge ("Left") is the visual RIGHT edge, and
+    /// "Right" would push the text to the visual left. Aligning both directions
+    /// to their start edge is what makes Persian stick right and English left.
+    /// </summary>
+    private static TextAlignment AlignmentFor(FlowDirection direction)
+        => TextAlignment.Left;
+
+    private void SetDirection(Paragraph paragraph, FlowDirection direction)
+        => ApplyDirection(paragraph, direction, PersianFont, EnglishFont);
+
+    /// <summary>
+    /// Applies one direction to a paragraph. Local values are required: a
+    /// FlowDocument can retain a previous inherited LTR layout even after its
+    /// paragraph style changes. TextAlignment is flow-relative — the start
+    /// edge ("Left") is the visual RIGHT edge on RTL paragraphs. Static so
+    /// batched (chunked) direction changes can reuse it.
+    /// </summary>
+    public static void ApplyDirection(Paragraph paragraph, FlowDirection direction,
+        FontFamily? persianFont, FontFamily? englishFont)
+    {
+        paragraph.FlowDirection = direction;
+        paragraph.TextAlignment = AlignmentFor(direction);
+        paragraph.Margin = new Thickness(0);
+
+        // A Persian paragraph renders entirely in the Persian font (including
+        // spaces and punctuation), an English paragraph entirely in the English
+        // one — that keeps word spacing consistent inside every line.
+        if (direction == FlowDirection.RightToLeft && persianFont is not null)
+            paragraph.FontFamily = persianFont;
+        else if (direction == FlowDirection.LeftToRight && englishFont is not null)
+            paragraph.FontFamily = englishFont;
     }
 
     public void UpdatePageWidth(bool wrap)
     {
         var doc = _editor.Document;
+        var viewport = _editor.ViewportWidth > 0 ? _editor.ViewportWidth : _editor.ActualWidth;
         if (wrap)
         {
+            // FlowDocument otherwise uses its default narrow column. Paragraph
+            // alignment is then correct only inside that column, which makes a
+            // visually RTL line appear on the left of a wide editor.
+            if (viewport > 0 && (double.IsNaN(doc.ColumnWidth) || Math.Abs(doc.ColumnWidth - viewport) > 0.5))
+                doc.ColumnWidth = viewport;
             if (!double.IsNaN(doc.PageWidth))
                 doc.PageWidth = double.NaN;
             return;
@@ -116,7 +181,6 @@ public sealed class BilingualText
 
         // A fixed 100000-DIP page puts right-aligned text far outside the viewport.
         // Use the viewport for short lines and expand only for real unwrapped content.
-        var viewport = _editor.ViewportWidth > 0 ? _editor.ViewportWidth : _editor.ActualWidth;
         var width = Math.Max(100, viewport);
         var typeface = new Typeface(doc.FontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
         foreach (var paragraph in doc.Blocks.OfType<Paragraph>())
@@ -128,5 +192,10 @@ public sealed class BilingualText
         }
         if (double.IsNaN(doc.PageWidth) || Math.Abs(doc.PageWidth - width) > 0.5)
             doc.PageWidth = width;
+        // Without this the no-wrap layout also flows into the default ~280px
+        // column and right-aligned Persian lines stop far from the right edge.
+        var columnWidth = Math.Max(1, width - doc.PagePadding.Left - doc.PagePadding.Right);
+        if (double.IsNaN(doc.ColumnWidth) || Math.Abs(doc.ColumnWidth - columnWidth) > 0.5)
+            doc.ColumnWidth = columnWidth;
     }
 }

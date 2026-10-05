@@ -93,21 +93,23 @@ public static class RichTextHelper
     /// <summary>Line/column for the caret; when word wrap is off every paragraph is one line.</summary>
     public static (int Line, int Column) GetLineColumn(RichTextBox rtb)
     {
-        var caret = rtb.CaretPosition;
-        var lineStart = caret.GetLineStartPosition(0);
-        if (lineStart is null)
-            return (1, 1);
+        var doc = rtb.Document;
+        int caretIndex = IndexOf(doc, rtb.CaretPosition);
+        var text = rtb.GetText();
 
         int line = 1;
-        var walk = lineStart;
-        while (walk.GetLineStartPosition(-1) is { } prev)
+        int lastNewline = -1;
+        var limit = Math.Min(caretIndex, text.Length);
+        for (int i = 0; i < limit; i++)
         {
-            walk = prev;
-            line++;
+            if (text[i] == '\n')
+            {
+                line++;
+                lastNewline = i;
+            }
         }
-
-        int column = Math.Max(1, IndexOf(rtb.Document, caret) - IndexOf(rtb.Document, lineStart) + 1);
-        return (line, column);
+        int column = caretIndex - (lastNewline + 1) + 1;
+        return (line, Math.Max(1, column));
     }
 
     /// <summary>Total number of text lines (paragraphs) in the document.</summary>

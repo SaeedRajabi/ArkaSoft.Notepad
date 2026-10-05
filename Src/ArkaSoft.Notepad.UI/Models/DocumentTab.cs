@@ -38,6 +38,31 @@ public sealed class DocumentTab : INotifyPropertyChanged
     public BilingualText TextLayout { get; }
     public string LastText { get; set; }
 
+    /// <summary>Layout host that pairs the editor with its line-number gutter.</summary>
+    public Grid Host { get; internal set; } = new();
+
+    /// <summary>Canvas that hosts line numbers for LTR paragraphs.</summary>
+    public Canvas Gutter { get; internal set; } = new();
+
+    /// <summary>Canvas that hosts line numbers for RTL paragraphs.</summary>
+    public Canvas RightGutter { get; internal set; } = new();
+
+    /// <summary>Prevents many layout/scroll notifications from queuing duplicate renders.</summary>
+    public bool GutterUpdateQueued { get; set; }
+
+    /// <summary>Last known write time of the file on disk, for change detection.</summary>
+    public DateTime LastWriteStamp { get; set; }
+
+    /// <summary>Set when the file changed on disk while the tab was not visible.</summary>
+    public bool PendingDiskChange { get; set; }
+
+    /// <summary>Incremented when a batched direction change starts, so an older
+    /// chunked run stops when a newer one (or an edit) supersedes it.</summary>
+    public int DirectionApplyGeneration { get; set; }
+
+    /// <summary>When true the active tab is shown rendered as HTML (WebView2).</summary>
+    public bool RenderHtml { get; set; }
+
     public Encoding Encoding { get; set; }
 
     public IReadOnlyList<(int Start, int Length)> Highlights => _highlights;

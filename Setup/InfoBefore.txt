@@ -1,0 +1,53 @@
+==========================================================================
+ ARKASOFT NOTEPAD - READ ME BEFORE INSTALLING
+==========================================================================
+ Copyright (c) 2026 Saeed Rajabi - ArkaSoftware
+ Website: https://arkasoftware.ir
+
+--------------------------------------------------------------------------
+ WHAT IS ARKASOFT NOTEPAD?
+--------------------------------------------------------------------------
+ ArkaSoft Notepad is a fast, lightweight text editor for Windows with a
+ modern Windows 11 style interface. It is designed to replace the classic
+ Windows Notepad while adding the features you actually need:
+
+   - Multiple tabs in a single window, with a visual file Explorer
+   - Full right-to-left (Persian/Arabic) support with automatic
+     paragraph direction and bilingual font settings
+   - Light and dark themes, with automatic Windows theme detection
+   - Find and Replace with match highlighting
+   - Text tools: case conversion, line sorting, duplicate removal
+   - Line numbers, zoom, word wrap, Go to Line
+   - Printing with page setup, and text encoding selection
+     (UTF-8, UTF-8 with BOM, UTF-16 LE/BE, ANSI)
+   - Session restore: unsaved work is recovered after a restart
+   - Recent files and drag-and-drop support
+
+--------------------------------------------------------------------------
+ SYSTEM REQUIREMENTS
+--------------------------------------------------------------------------
+   - Operating system: Windows 10 (build 1903 or later) or Windows 11
+   - Runtime: .NET 10 Desktop Runtime
+     (https://dotnet.microsoft.com/download/dotnet/10.0)
+     Skip this step if your installer package bundles the runtime or if
+     a previous version of the application already runs on this PC.
+   - Disk space: approximately 50 MB
+
+--------------------------------------------------------------------------
+ BEFORE YOU INSTALL
+--------------------------------------------------------------------------
+   1. Close all running instances of ArkaSoft Notepad.
+   2. Existing documents are not touched by the installer. Your settings
+      and session are preserved during upgrades.
+   3. No administrator rights are required: the application installs
+      per user by default.
+
+--------------------------------------------------------------------------
+ LICENSE
+--------------------------------------------------------------------------
+ ArkaSoft Notepad is freeware. Please review the license agreement
+ shown on the next installer page. By continuing the installation you
+ accept its terms.
+
+ Thank you for choosing ArkaSoft Notepad!
+ - Saeed Rajabi, ArkaSoftware (https://arkasoftware.ir)

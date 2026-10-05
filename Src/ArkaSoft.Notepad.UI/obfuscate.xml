@@ -1,0 +1,43 @@
+<!--
+  Obfuscar configuration template for ArkaSoft Notepad (WPF-safe).
+
+  The __REFS__ token is replaced by the ObfuscateRelease MSBuild target
+  with the path to staged framework reference assemblies, and the result
+  is written to obj\obfuscate.gen.xml before Obfuscar runs.
+
+  Rules of thumb baked into this file:
+    - Public API stays untouched (KeepPublicApi): XAML/BAML, {Binding}
+      expressions, x:Static commands and JSON property names resolve by
+      name, so public members must keep their names.
+    - Private and internal members are renamed (HidePrivateApi): the
+      bulk of the logic lives there, so decompiled output loses every
+      meaningful identifier.
+    - String constants are encrypted (HideStrings): resource keys, file
+      paths, and internal messages no longer appear as readable text in
+      the binary. They are decrypted at runtime.
+    - Debug info is dropped (RegenerateDebugInfo=false).
+-->
+<Obfuscator>
+  <Var name="InPath" value="bin\Release\net10.0-windows" />
+  <Var name="OutPath" value="obj\obfuscated" />
+  <AssemblySearchPath path="__REFS__" />
+
+  <!-- keep public surface, scramble everything private/internal -->
+  <Var name="KeepPublicApi" value="true" />
+  <Var name="HidePrivateApi" value="true" />
+  <Var name="RenameProperties" value="false" />
+  <Var name="RenameEvents" value="false" />
+
+  <!-- encrypt string constants -->
+  <Var name="HideStrings" value="true" />
+
+  <!-- renamed identifiers use unicode soup: decompilers show unreadable
+       names instead of a,A,a1,a2 patterns that invite pattern-matching -->
+  <Var name="UseUnicodeNames" value="true" />
+
+  <!-- drop debug metadata -->
+  <Var name="RegenerateDebugInfo" value="false" />
+
+  <!-- the application assembly only; framework DLLs are untouched -->
+  <Module file="$(InPath)\ArkaSoft.Notepad.dll" />
+</Obfuscator>

@@ -8,14 +8,108 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>ArkaSoft.Notepad.UI</RootNamespace>
     <AssemblyName>ArkaSoft.Notepad</AssemblyName>
-    <Version>1.0.0</Version>
+    <Version>1.5.0</Version>
     <Product>ArkaSoft Notepad</Product>
+    <ApplicationIcon>Assets\Icons\appLogo.ico</ApplicationIcon>
+    <StartupObject>ArkaSoft.Notepad.UI.App</StartupObject>
+    <Copyright>Copyright (c) 2026 Saeed Rajabi - ArkaSoftware</Copyright>
+    <PackageProjectUrl>https://arkasoftware.ir</PackageProjectUrl>
+    <Description>ArkaSoft Notepad is a fast, lightweight text editor for Windows with a
+modern Windows 11 style interface. It combines the simplicity of the
+classic Windows Notepad with the power users actually need: multi-tab
+editing, a Visual Studio Code style file explorer, full right-to-left
+(Persian/Arabic) support, light and dark themes, advanced find and
+replace, text tools, printing, and automatic session restore.</Description>
+    <PackageIcon>appLogo.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <NeutralLanguage>en</NeutralLanguage>
+    <PackageLicenseFile>License.txt</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <!--
+    Release hardening: no debug symbols and no symbol metadata leakage.
+    Debug builds keep full symbols for development.
+  -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <EmbedUntrackedSources>false</EmbedUntrackedSources>
   </PropertyGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\Icons\appLogo.png"/>
-    <Resource Include="Assets\Fonts\Vazir.ttf"/>
-    <Content Include="Assets\Fonts\Vazir.ttf" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>
+    <!--
+      Obfuscation (Release only): renames private/internal symbols and
+      encrypts string constants so decompiled output becomes unreadable.
+      Obfuscar.Console runs automatically after a Release build; the
+      WPF-safe rules live in obfuscate.xml next to this file.
+    -->
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4258.31" />
+    <PackageReference Include="Obfuscar" Version="2.2.38"
+                      GeneratePathProperty="true" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!--
+    Runs Obfuscar over the built assembly and puts the obfuscated binary
+    back into the build output. Framework reference assemblies are staged
+    first so Obfuscar can resolve WPF/System dependencies.
+  -->
+  <Target Name="ObfuscateRelease" AfterTargets="Build"
+          Condition="'$(Configuration)' == 'Release'">
+    <PropertyGroup>
+      <ObfuscarOut>$(MSBuildProjectDirectory)\obj\obfuscated</ObfuscarOut>
+      <ObfuscarRefs>$(MSBuildProjectDirectory)\obj\obfuscar-refs</ObfuscarRefs>
+      <ObfuscarTfm>net$([System.String]::Copy('$(TargetFrameworkVersion)').TrimStart('v'))</ObfuscarTfm>
+    </PropertyGroup>
+
+    <!-- stage the .NETCore + WindowsDesktop targeting pack reference
+         assemblies so Obfuscar can resolve framework dependencies -->
+    <ItemGroup>
+      <_KnownPack Include="@(KnownFrameworkReference)"
+                  Condition="('%(Identity)' == 'Microsoft.WindowsDesktop.App' Or '%(Identity)' == 'Microsoft.NETCore.App') And '%(TargetFramework)' == '$(ObfuscarTfm)'" />
+      <ObfuscarRefFiles Include="$(NetCoreTargetingPackRoot)\%(_KnownPack.TargetingPackName)\%(_KnownPack.TargetingPackVersion)\ref\$(ObfuscarTfm)\*.dll" />
+    </ItemGroup>
+    <MakeDir Directories="$(ObfuscarRefs)" />
+    <Copy SourceFiles="@(ObfuscarRefFiles)"
+          DestinationFolder="$(ObfuscarRefs)"
+          SkipUnchangedFiles="true" />
+
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)"
+          Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;(Get-Content -Raw 'obfuscate.xml') -replace '__REFS__', '$(ObfuscarRefs)' | Set-Content -Encoding UTF8 'obj/obfuscate.gen.xml'&quot;" />
+
+    <RemoveDir Directories="$(ObfuscarOut)" />
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)"
+          Command="&quot;$(PkgObfuscar)\tools\Obfuscar.Console.exe&quot; -s obj/obfuscate.gen.xml"
+          IgnoreExitCode="false" />
+    <Copy SourceFiles="$(ObfuscarOut)\ArkaSoft.Notepad.dll"
+          DestinationFiles="$(TargetPath)"
+          OverwriteReadOnlyFiles="true" />
+    <Message Importance="high"
+             Text="Obfuscation complete: $(TargetPath) replaced with protected binary" />
+  </Target>
+
+  <ItemGroup>
+    <Resource Include="Assets\Icons\appLogo.png" />
+    <Resource Include="Assets\Fonts\Vazir.ttf" />
+    <Content Include="Assets\Fonts\Vazir.ttf" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\Setup\License.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Assets\Icons\appLogo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

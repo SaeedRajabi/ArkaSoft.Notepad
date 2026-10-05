@@ -10,10 +10,23 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        var argFiles = e.Args
+            .Where(a => !a.StartsWith("-", StringComparison.Ordinal))
+            .ToList();
+
+        // Single instance: hand files off to the running window and exit.
+        if (!SingleInstanceService.TryAcquire())
+        {
+            SingleInstanceService.ForwardToRunningInstance(argFiles);
+            Shutdown();
+            return;
+        }
+
         var settings = SettingsService.Load();
         ThemeService.Apply((AppTheme)settings.Theme);
         TypographyService.Apply(settings);
         LocalizationService.Apply(settings.InterfaceLanguage);
+        FileAssociationService.EnsureRegistered();
 
         DispatcherUnhandledException += (_, args) =>
         {
@@ -24,21 +37,23 @@ public partial class App : Application
             args.Handled = true;
         };
 
-        var argFiles = e.Args
-            .Where(a => !a.StartsWith("-", StringComparison.Ordinal))
-            .ToList();
+        SessionState? session = null;
+        if (argFiles.Count == 0 && settings.RestoreSession)
+            session = SessionService.Load();
+        else if (settings.RestoreSession)
+            SessionService.Clear();
 
+        MainWindow window;
         if (argFiles.Count > 0)
-        {
-            new MainWindow(settings, argFiles).Show();
-        }
-        else if (settings.SessionFiles.Count > 0 && settings.SessionFiles.Any(File.Exists))
-        {
-            new MainWindow(settings, settings.SessionFiles).Show();
-        }
+            window = new MainWindow(settings, argFiles);
+        else if (session is not null)
+            window = new MainWindow(settings, session: session);
         else
-        {
-            new MainWindow(settings).Show();
-        }
+            window = new MainWindow(settings);
+        window.Show();
+
+        SingleInstanceService.StartServer(
+            files => window.OpenFilesFromSecondInstance(files),
+            () => window.BringToFront());
     }
 }

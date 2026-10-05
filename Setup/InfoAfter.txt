@@ -1,0 +1,52 @@
+==========================================================================
+ ARKASOFT NOTEPAD - INSTALLATION COMPLETE
+==========================================================================
+ Copyright (c) 2026 Saeed Rajabi - ArkaSoftware
+ Website: https://arkasoftware.ir
+
+--------------------------------------------------------------------------
+ GETTING STARTED
+--------------------------------------------------------------------------
+   - Launch ArkaSoft Notepad from the Start menu or the desktop
+     shortcut.
+   - Use Ctrl+T for a new tab and Ctrl+W to close the current tab.
+   - Click the folder icon in the Explorer sidebar to open a working
+     folder; right-click files or folders to create, rename, or delete
+     them - just like in Visual Studio Code.
+   - Double-click a file in the Explorer to open it in a new tab.
+   - Ctrl+F finds text, Ctrl+H replaces it, Ctrl+G jumps to a line.
+   - Ctrl+B toggles the Explorer sidebar.
+
+--------------------------------------------------------------------------
+ FILE ASSOCIATIONS
+--------------------------------------------------------------------------
+ To make ArkaSoft Notepad the default editor for .txt, .log, .md, .ini,
+ .cfg, or .csv files, open "File -> File associations...", mark the
+ types you want, and press Apply. The file icons in Windows Explorer
+ will then show the ArkaSoft Notepad logo. You can also change
+ defaults later from "Windows Settings -> Apps -> Default apps".
+
+--------------------------------------------------------------------------
+ PERSIAN / RIGHT-TO-LEFT USERS
+--------------------------------------------------------------------------
+ Persian text is detected automatically and anchored to the right. For
+ the full right-to-left interface, open "View -> Fonts and language..."
+ and set the interface language to Persian.
+
+--------------------------------------------------------------------------
+ YOUR DATA
+--------------------------------------------------------------------------
+   - Settings:  %APPDATA%\ArkaSoft.Notepad\settings.json
+   - Session:   %APPDATA%\ArkaSoft.Notepad\session (unsaved drafts are
+                saved here and restored on the next launch)
+
+ Uninstalling the application does not delete these files, so your
+ preferences and unsaved drafts survive an uninstall/reinstall cycle.
+
+--------------------------------------------------------------------------
+ SUPPORT
+--------------------------------------------------------------------------
+ Found a bug or have a feature request? Visit https://arkasoftware.ir
+
+ Thank you for using ArkaSoft Notepad!
+ - Saeed Rajabi, ArkaSoftware

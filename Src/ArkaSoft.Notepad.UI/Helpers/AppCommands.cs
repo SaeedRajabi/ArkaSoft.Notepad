@@ -91,4 +91,43 @@ public static class AppCommands
 
     public static readonly RoutedUICommand InsertEmoji = new(
         "Emoji", "InsertEmoji", typeof(AppCommands));
+
+    public static readonly RoutedUICommand ToggleLineNumbers = new(
+        "Line numbers", "ToggleLineNumbers", typeof(AppCommands));
+
+    public static readonly RoutedUICommand ToggleSidebar = new(
+        "Explorer", "ToggleSidebar", typeof(AppCommands),
+        new InputGestureCollection { new KeyGesture(Key.B, ModifierKeys.Control) });
+
+    public static readonly RoutedUICommand FileAssociations = new(
+        "File associations", "FileAssociations", typeof(AppCommands));
+
+    public static readonly RoutedUICommand About = new(
+        "About", "About", typeof(AppCommands));
+
+    public static readonly RoutedUICommand ToggleSessionRestore = new(
+        "Restore previous session", "ToggleSessionRestore", typeof(AppCommands));
+
+    public static readonly RoutedUICommand UpperCase = new(
+        "UPPERCASE", "UpperCase", typeof(AppCommands),
+        new InputGestureCollection { new KeyGesture(Key.U, ModifierKeys.Control | ModifierKeys.Shift) });
+
+    public static readonly RoutedUICommand LowerCase = new(
+        "lowercase", "LowerCase", typeof(AppCommands),
+        new InputGestureCollection { new KeyGesture(Key.L, ModifierKeys.Control | ModifierKeys.Shift) });
+
+    public static readonly RoutedUICommand TitleCase = new(
+        "Title Case", "TitleCase", typeof(AppCommands));
+
+    public static readonly RoutedUICommand TrimTrailing = new(
+        "Trim trailing whitespace", "TrimTrailing", typeof(AppCommands));
+
+    public static readonly RoutedUICommand SortLinesAsc = new(
+        "Sort lines A to Z", "SortLinesAsc", typeof(AppCommands));
+
+    public static readonly RoutedUICommand SortLinesDesc = new(
+        "Sort lines Z to A", "SortLinesDesc", typeof(AppCommands));
+
+    public static readonly RoutedUICommand RemoveDuplicateLines = new(
+        "Remove duplicate lines", "RemoveDuplicateLines", typeof(AppCommands));
 }

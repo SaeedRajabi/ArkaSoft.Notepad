@@ -1,0 +1,98 @@
+==========================================================================
+ ARKASOFT NOTEPAD - PRODUCT DESCRIPTION
+==========================================================================
+ Copyright (c) 2026 Saeed Rajabi - ArkaSoftware
+ Website: https://arkasoftware.ir
+
+--------------------------------------------------------------------------
+ SHORT DESCRIPTION (for listings and download sites)
+--------------------------------------------------------------------------
+ArkaSoft Notepad is a fast, lightweight text editor for Windows with a
+modern Windows 11 style interface. It combines the simplicity of the
+classic Windows Notepad with the power users actually need: multi-tab
+editing, a Visual Studio Code style file explorer, full right-to-left
+(Persian/Arabic) support, light and dark themes, advanced find and
+replace, text tools, printing, and automatic session restore.
+
+Developed by Saeed Rajabi - ArkaSoftware.
+https://arkasoftware.ir
+
+--------------------------------------------------------------------------
+ FULL DESCRIPTION
+--------------------------------------------------------------------------
+ArkaSoft Notepad replaces the classic Windows Notepad with a clean,
+fluent experience that feels native on Windows 11.
+
+EDITING THAT SCALES WITH YOU
+Work on many files at once with tabs, search through your documents
+with highlighted find-and-replace results, jump to any line, insert
+timestamps, and clean up content with one-click text tools: case
+conversion, trailing-space trimming, line sorting, and duplicate-line
+removal.
+
+A REAL FILE EXPLORER
+Open a folder and browse it in the built-in sidebar, complete with
+colored icons for every file type. Create files and folders inline
+(just like in Visual Studio Code), rename them with full extension
+editing, delete them safely, and reveal them in Windows Explorer - all
+from right-click menus. The sidebar can be pinned, auto-hidden with a
+hover strip, or closed entirely, and resized to fit your workflow.
+
+BUILT FOR PERSIAN AND RIGHT-TO-LEFT
+Persian text is detected automatically and anchored to the right edge,
+flowing correctly from right to left - and back to left-to-right the
+moment you type English. Choose separate fonts for Persian and English
+text, and switch the entire interface between English and Persian.
+
+LIGHT, DARK, AND EVERYTHING BETWEEN
+Follow the Windows theme automatically or pick Light and Dark manually.
+Every corner of the interface - title bar, tabs, menus, dialogs, and
+the file explorer - is styled with the same modern Windows 11 language.
+
+NEVER LOSE YOUR WORK
+Your session, including unsaved drafts, is continuously saved and
+restored on the next launch. Recent files, per-file encodings (UTF-8,
+UTF-8 with BOM, UTF-16 LE/BE, ANSI), and window layout are remembered
+between runs.
+
+YOURS, IN EVERY WAY
+Register ArkaSoft Notepad as the default editor for .txt, .log, .md,
+.ini, .cfg, and .csv files and the application logo appears on those
+files in Windows Explorer. No telemetry, no accounts, no network
+access - everything stays on your device.
+
+--------------------------------------------------------------------------
+ KEY FEATURES AT A GLANCE
+--------------------------------------------------------------------------
+ - Multi-tab editing in a single window
+ - VS Code style file explorer with inline file/folder creation
+ - Automatic Persian / right-to-left paragraph direction
+ - Bilingual interface: English and Persian
+ - Light / Dark / Windows theme following
+ - Find and replace with live highlighting
+ - Text tools: case conversion, sorting, dedupe, trimming
+ - Line numbers, zoom (10-500%), word wrap, Go to Line
+ - Session restore with unsaved-draft recovery
+ - Recent files, drag-and-drop, single-instance file opening
+ - Printing with page setup and full encoding support
+ - File associations with branded file icons
+ - Fast startup, tiny footprint, and completely offline
+
+--------------------------------------------------------------------------
+ SYSTEM REQUIREMENTS
+--------------------------------------------------------------------------
+ - Windows 10 (build 1903+) or Windows 11
+ - .NET 10 Desktop Runtime (unless the package bundles it)
+
+--------------------------------------------------------------------------
+ ABOUT THE DEVELOPER
+--------------------------------------------------------------------------
+ ArkaSoft Notepad is designed and developed by Saeed Rajabi as part of
+ the ArkaSoftware development team.
+
+   Developer: Saeed Rajabi
+   Company:   ArkaSoftware
+   Website:   https://arkasoftware.ir
+
+ ArkaSoft Notepad is freeware - free for personal and commercial use.
+ See License.txt for the full license terms.

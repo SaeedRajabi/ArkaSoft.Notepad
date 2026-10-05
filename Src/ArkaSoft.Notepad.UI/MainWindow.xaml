@@ -4,7 +4,7 @@
         xmlns:cmd="clr-namespace:ArkaSoft.Notepad.UI.Helpers"
         xmlns:controls="clr-namespace:ArkaSoft.Notepad.UI.Controls"
         Title="Untitled - Notepad"
-        Width="940" Height="640" MinWidth="500" MinHeight="360"
+        Width="940" Height="640" MinWidth="700" MinHeight="360"
         Background="{DynamicResource C.Window}"
         FontFamily="{DynamicResource F.Ui}"
         FlowDirection="{DynamicResource Ui.Direction}" Language="{DynamicResource Ui.Language}"
@@ -14,12 +14,12 @@
         Closed="Window_Closed"
         Closing="Window_Closing"
         DragOver="Window_DragOver" Drop="Window_Drop"
-        PreviewMouseWheel="Window_PreviewMouseWheel">
+        PreviewMouseWheel="Window_PreviewMouseWheel" >
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="40"
                       ResizeBorderThickness="6"
                       GlassFrameThickness="0,0,0,1"
-                      CornerRadius="0"/>
+                      CornerRadius="10"/>
     </WindowChrome.WindowChrome>
 
     <Window.InputBindings>
@@ -33,6 +33,7 @@
         <KeyBinding Modifiers="Control" Key="Subtract" Command="{x:Static cmd:AppCommands.ZoomOut}"/>
         <KeyBinding Modifiers="Control" Key="D0" Command="{x:Static cmd:AppCommands.ZoomReset}"/>
         <KeyBinding Modifiers="Control" Key="NumPad0" Command="{x:Static cmd:AppCommands.ZoomReset}"/>
+        <KeyBinding Modifiers="Control" Key="B" Command="{x:Static cmd:AppCommands.ToggleSidebar}"/>
     </Window.InputBindings>
 
     <Window.CommandBindings>
@@ -63,18 +64,35 @@
         <CommandBinding Command="{x:Static cmd:AppCommands.SetThemeDark}" Executed="ThemeDark_Executed"/>
         <CommandBinding Command="{x:Static cmd:AppCommands.NextTab}" Executed="NextTab_Executed"/>
         <CommandBinding Command="{x:Static cmd:AppCommands.PreviousTab}" Executed="PreviousTab_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.ToggleLineNumbers}" Executed="LineNumbers_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.ToggleSidebar}" Executed="ToggleSidebar_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.FileAssociations}" Executed="FileAssociations_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.About}" Executed="About_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.ToggleSessionRestore}" Executed="RestoreSession_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.UpperCase}" Executed="UpperCase_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.LowerCase}" Executed="LowerCase_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.TitleCase}" Executed="TitleCase_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.TrimTrailing}" Executed="TrimTrailing_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.SortLinesAsc}" Executed="SortLinesAsc_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.SortLinesDesc}" Executed="SortLinesDesc_Executed"/>
+        <CommandBinding Command="{x:Static cmd:AppCommands.RemoveDuplicateLines}" Executed="RemoveDuplicates_Executed"/>
     </Window.CommandBindings>
 
     <Grid x:Name="RootGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="811*"/>
+            <ColumnDefinition Width="129*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition Height="40"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- ============ Title bar with tabs ============ -->
-        <Grid Grid.Row="0" Background="Transparent" FlowDirection="LeftToRight">
+        <Grid Grid.Row="0" Background="Transparent" FlowDirection="LeftToRight" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -95,9 +113,14 @@
                         Style="{StaticResource TitleTabs}"
                         ItemContainerStyle="{StaticResource TitleTabItem}"
                         MinWidth="120"
+                        AllowDrop="True"
                         WindowChrome.IsHitTestVisibleInChrome="True"
                         SelectionChanged="DocTabs_SelectionChanged"
-                        PreviewMouseDown="DocTabs_PreviewMouseDown"/>
+                        PreviewMouseDown="DocTabs_PreviewMouseDown"
+                        PreviewMouseLeftButtonDown="DocTabs_PreviewMouseLeftButtonDown"
+                        PreviewMouseMove="DocTabs_PreviewMouseMove"
+                        DragOver="DocTabs_DragOver"
+                        Drop="DocTabs_Drop"/>
 
             <Button Grid.Column="2" x:Name="NewTabButton"
                     Style="{StaticResource Btn.Icon}" Width="30" Height="30"
@@ -117,7 +140,7 @@
         </Grid>
 
         <!-- ============ Menu bar ============ -->
-        <Menu Grid.Row="1" Margin="8,0,0,0">
+        <Menu Grid.Row="1" Margin="8,0,0,0" Grid.ColumnSpan="2">
             <MenuItem Header="{DynamicResource T.File}">
                 <MenuItem Header="{DynamicResource T.NewTab}" Command="{x:Static cmd:AppCommands.NewTab}">
                     <MenuItem.Icon>
@@ -131,6 +154,10 @@
                         <TextBlock Text="&#xE8E5;" FontFamily="{DynamicResource F.Icons}" FontSize="14"
                                    Foreground="{DynamicResource C.Text2}"/>
                     </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{DynamicResource T.Recent}" x:Name="RecentMenuItem"
+                          SubmenuOpened="RecentMenuItem_SubmenuOpened">
+                    <MenuItem Header="{DynamicResource T.NoRecentFiles}" IsEnabled="False"/>
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="{DynamicResource T.Save}" Command="{x:Static cmd:AppCommands.Save}">
@@ -151,6 +178,12 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
+                <MenuItem Header="{DynamicResource T.FileAssocMenu}" Command="{x:Static cmd:AppCommands.FileAssociations}">
+                    <MenuItem.Icon>
+                        <TextBlock Text="&#xE8A5;" FontFamily="{DynamicResource F.Icons}" FontSize="14"
+                                   Foreground="{DynamicResource C.Text2}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem Header="{DynamicResource T.Exit}" Command="{x:Static cmd:AppCommands.Exit}"/>
             </MenuItem>
 
@@ -181,6 +214,23 @@
                                    Foreground="{DynamicResource C.Text2}"/>
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem Header="{DynamicResource T.TextTools}">
+                    <MenuItem.Icon>
+                        <TextBlock Text="&#xE70F;" FontFamily="{DynamicResource F.Icons}" FontSize="14"
+                                   Foreground="{DynamicResource C.Text2}"/>
+                    </MenuItem.Icon>
+                    <MenuItem Header="{DynamicResource T.UpperCase}" Command="{x:Static cmd:AppCommands.UpperCase}"
+                              InputGestureText="Ctrl + Shift + U"/>
+                    <MenuItem Header="{DynamicResource T.LowerCase}" Command="{x:Static cmd:AppCommands.LowerCase}"
+                              InputGestureText="Ctrl + Shift + L"/>
+                    <MenuItem Header="{DynamicResource T.TitleCase}" Command="{x:Static cmd:AppCommands.TitleCase}"/>
+                    <Separator/>
+                    <MenuItem Header="{DynamicResource T.TrimTrailing}" Command="{x:Static cmd:AppCommands.TrimTrailing}"/>
+                    <Separator/>
+                    <MenuItem Header="{DynamicResource T.SortAsc}" Command="{x:Static cmd:AppCommands.SortLinesAsc}"/>
+                    <MenuItem Header="{DynamicResource T.SortDesc}" Command="{x:Static cmd:AppCommands.SortLinesDesc}"/>
+                    <MenuItem Header="{DynamicResource T.RemoveDuplicates}" Command="{x:Static cmd:AppCommands.RemoveDuplicateLines}"/>
+                </MenuItem>
             </MenuItem>
 
             <MenuItem Header="{DynamicResource T.View}">
@@ -195,8 +245,19 @@
                 <MenuItem Header="{DynamicResource T.WordWrap}" x:Name="WordWrapMenuItem"
                           Command="{x:Static cmd:AppCommands.ToggleWordWrap}"
                           IsCheckable="True"/>
+                <MenuItem Header="{DynamicResource T.SidebarTitle}" x:Name="SidebarMenuItem"
+                          Command="{x:Static cmd:AppCommands.ToggleSidebar}"
+                          IsCheckable="True"/>
+                <MenuItem Header="{DynamicResource T.LineNumbers}" x:Name="LineNumbersMenuItem"
+                          Command="{x:Static cmd:AppCommands.ToggleLineNumbers}"
+                          IsCheckable="True"/>
                 <MenuItem Header="{DynamicResource T.StatusBar}" x:Name="StatusBarMenuItem"
                           Command="{x:Static cmd:AppCommands.ToggleStatusBar}"
+                          IsCheckable="True" IsChecked="True"/>
+                <MenuItem Header="{DynamicResource T.RenderHtml}" x:Name="RenderHtmlMenuItem"
+                          IsCheckable="True" Click="RenderHtmlMenuItem_Click"/>
+                <MenuItem Header="{DynamicResource T.RestoreSession}" x:Name="RestoreSessionMenuItem"
+                          Command="{x:Static cmd:AppCommands.ToggleSessionRestore}"
                           IsCheckable="True" IsChecked="True"/>
                 <MenuItem Header="{DynamicResource T.Fonts}" Command="{x:Static cmd:AppCommands.FontSettings}"/>
                 <Separator/>
@@ -212,22 +273,113 @@
                               IsCheckable="True"/>
                 </MenuItem>
             </MenuItem>
+
+            <MenuItem Header="{DynamicResource T.Help}">
+                <MenuItem Header="{DynamicResource T.AboutMenu}" Command="{x:Static cmd:AppCommands.About}">
+                    <MenuItem.Icon>
+                        <TextBlock Text="&#xE946;" FontFamily="{DynamicResource F.Icons}" FontSize="14"
+                                   Foreground="{DynamicResource C.Text2}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
         </Menu>
 
         <!-- ============ Editor area ============ -->
-        <Grid Grid.Row="2">
-            <ContentPresenter x:Name="EditorHost" FlowDirection="LeftToRight"/>
-            <controls:FindReplacePanel x:Name="FindPanel"
-                                       HorizontalAlignment="Right"
-                                       VerticalAlignment="Top"
-                                       Visibility="Collapsed"/>
+        <!-- ============ Formatting toolbar ============ -->
+        <Border Grid.Row="2" x:Name="FormatBar"
+                Background="{DynamicResource C.Window}"
+                BorderBrush="{DynamicResource C.Line}" BorderThickness="0,1,0,1" Grid.ColumnSpan="2">
+            <WrapPanel Margin="6,3" VerticalAlignment="Center">
+                <Button x:Name="BoldButton" Style="{StaticResource Btn.Icon}" Width="28" Height="26"
+                        FontFamily="{DynamicResource F.Icons}" FontSize="12" Content="&#xE734;"
+                        ToolTip="{DynamicResource T.Bold}" Click="BoldButton_Click"/>
+                <Button x:Name="ItalicButton" Style="{StaticResource Btn.Icon}" Width="28" Height="26"
+                        FontFamily="{DynamicResource F.Icons}" FontSize="12" Content="&#xE735;"
+                        ToolTip="{DynamicResource T.Italic}" Click="ItalicButton_Click"/>
+                <Button x:Name="UnderlineButton" Style="{StaticResource Btn.Icon}" Width="28" Height="26"
+                        ToolTip="{DynamicResource T.Underline2}" Click="UnderlineButton_Click">
+                    <TextBlock Text="U" FontFamily="{DynamicResource F.Ui}" FontSize="13"
+                               TextDecorations="Underline"/>
+                </Button>
+                <Border Width="1" Height="20" Background="{DynamicResource C.Line}" Margin="4,0"/>
+                <ComboBox x:Name="FontFamilyBox" Width="150" Height="26" Margin="2,0,2,0"
+                          ToolTip="{DynamicResource T.FontFamilyTip}"
+                          SelectionChanged="FontFamilyBox_SelectionChanged"
+                          DropDownClosed="FontFamilyBox_DropDownClosed"/>
+                <ComboBox x:Name="FontSizeBox" Width="62" Height="26" Margin="2,0,2,0" Padding="0"
+                          SelectedItem="14"
+                          ToolTip="{DynamicResource T.FontSizeTip}"
+                          SelectionChanged="FontSizeBox_SelectionChanged"
+                          KeyDown="FontSizeBox_KeyDown"/>
+                <Border Width="1" Height="20" Background="{DynamicResource C.Line}" Margin="4,0"/>
+                <Button Style="{StaticResource Btn.Icon}" Width="28" Height="26"
+                        FontFamily="{DynamicResource F.Icons}" FontSize="12" Content="&#xE790;"
+                        ToolTip="{DynamicResource T.TextColor}" Click="TextColorButton_Click"/>
+                <Button Style="{StaticResource Btn.Icon}" Width="28" Height="26"
+                        FontFamily="{DynamicResource F.Icons}" FontSize="12" Content="&#xE7E6;"
+                        ToolTip="{DynamicResource T.Highlight}" Click="HighlightButton_Click"/>
+                <Border Width="1" Height="20" Background="{DynamicResource C.Line}" Margin="4,0"/>
+                <Button Width="30" Height="26" Content="H1" FontFamily="Segoe UI"
+                        FontSize="10" FontWeight="Bold" Margin="2,0" Padding="0"
+                        ToolTip="{DynamicResource T.Heading1}" Click="HeadingButton_Click" Tag="H1"/>
+                <Button Width="30" Height="26" Content="H2" FontFamily="Segoe UI"
+                        FontSize="12" FontWeight="Bold" Margin="2,0" Padding="0"
+                        ToolTip="{DynamicResource T.Heading2}" Click="HeadingButton_Click" Tag="H2"/>
+                <Button Width="30" Height="26" Content="H3" FontFamily="Segoe UI"
+                        FontSize="12" FontWeight="SemiBold" Margin="2,0" Padding="0"
+                        ToolTip="{DynamicResource T.Heading3}" Click="HeadingButton_Click" Tag="H3"/>
+                <Button Width="34" Height="26" Content="Aa" FontFamily="Segoe UI"
+                        FontSize="12" Margin="2,0" Padding="0"
+                        ToolTip="{DynamicResource T.NormalText}" Click="HeadingButton_Click" Tag="Normal"/>
+                <Border Width="1" Height="20" Background="{DynamicResource C.Line}" Margin="4,0"/>
+                <Button Style="{StaticResource Btn.Icon}" Width="28" Height="26"
+                        FontFamily="{DynamicResource F.Icons}" FontSize="12" Content="&#xE8FD;"
+                        ToolTip="{DynamicResource T.BulletList}" Click="BulletListButton_Click"/>
+                <Button Style="{StaticResource Btn.Icon}" Width="28" Height="26"
+                        FontFamily="{DynamicResource F.Icons}" FontSize="12" Content="&#xE8FE;"
+                        ToolTip="{DynamicResource T.NumberedList}" Click="NumberListButton_Click"/>
+                <Button Style="{StaticResource Btn.Icon}" Width="28" Height="26"
+                        FontFamily="{DynamicResource F.Icons}" FontSize="12" Content="&#xE91B;"
+                        ToolTip="{DynamicResource T.InsertImage}" Click="InsertImageButton_Click"/>
+                <Button Style="{StaticResource Btn.Icon}" Width="28" Height="26"
+                        FontFamily="{DynamicResource F.Icons}" FontSize="12" Content="&#xE714;"
+                        ToolTip="{DynamicResource T.InsertVideo}" Click="InsertVideoButton_Click"/>
+                <Button Style="{StaticResource Btn.Icon}" Width="28" Height="26"
+                        FontFamily="{DynamicResource F.Icons}" FontSize="12" Content="&#xE751;"
+                        ToolTip="{DynamicResource T.ClearFormat}" Click="ClearFormatButton_Click"/>
+            </WrapPanel>
+        </Border>
+
+        <!-- LTR container: keeps margins/alignment physical so the editor docks
+             against the sidebar correctly in both languages -->
+        <Grid Grid.Row="3" FlowDirection="LeftToRight" Grid.ColumnSpan="2">
+            <Grid x:Name="EditorArea" FlowDirection="LeftToRight">
+                <ContentPresenter x:Name="EditorHost"/>
+                <Grid x:Name="RenderPane" Visibility="Collapsed"
+                      Background="{DynamicResource C.Surface}" Panel.ZIndex="1">
+                    <Border x:Name="WebViewHost"/>
+                    <TextBlock x:Name="RenderMessage" Visibility="Collapsed"
+                               TextWrapping="Wrap" Margin="24"
+                               VerticalAlignment="Center" HorizontalAlignment="Center"
+                               FontFamily="{DynamicResource F.Ui}" FontSize="13"
+                               Foreground="{DynamicResource C.Text2}"/>
+                </Grid>
+                <controls:FindReplacePanel x:Name="FindPanel"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Top"
+                                           Visibility="Collapsed"/>
+            </Grid>
+            <!-- the panel itself re-takes the UI language flow so its content
+                 (header, tree indentation) stays RTL in Persian -->
+            <controls:SidebarPanel x:Name="Sidebar" Panel.ZIndex="2" Visibility="Collapsed"
+                                   FlowDirection="{DynamicResource Ui.Direction}"/>
         </Grid>
 
         <!-- ============ Status bar ============ -->
-        <Border Grid.Row="3" x:Name="StatusBar"
+        <Border Grid.Row="4" x:Name="StatusBar"
                 Background="{DynamicResource C.Window}"
                 BorderBrush="{DynamicResource C.Line}"
-                BorderThickness="0,1,0,0">
+                BorderThickness="0,1,0,0" Grid.ColumnSpan="2">
             <Grid Margin="8,0" Height="34">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -249,6 +401,14 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Style="{StaticResource Btn.Icon}"
+                            Width="26" Height="24" FontSize="12" FontFamily="{DynamicResource F.Icons}"
+                            Content="&#xE7DE;" ToolTip="{DynamicResource T.LTR}"
+                            Click="AlignLeftButton_Click"/>
+                    <Button Style="{StaticResource Btn.Icon}"
+                            Width="26" Height="24" FontSize="12" FontFamily="{DynamicResource F.Icons}"
+                            Content="&#xE7E1;" ToolTip="{DynamicResource T.RTL}"
+                            Click="AlignRightButton_Click"/>
                     <Button x:Name="ZoomOutStatus" Style="{StaticResource Btn.Icon}"
                             Width="26" Height="24" FontSize="14" FontFamily="Segoe UI"
                             Content="−" ToolTip="{DynamicResource T.ZoomOut}"

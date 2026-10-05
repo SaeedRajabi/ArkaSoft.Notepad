@@ -1,0 +1,92 @@
+==========================================================================
+ ARKASOFT NOTEPAD - END-USER LICENSE AGREEMENT
+==========================================================================
+ Copyright (c) 2026 Saeed Rajabi - ArkaSoftware
+ Website: https://arkasoftware.ir
+
+ IMPORTANT - PLEASE READ THIS LICENSE AGREEMENT CAREFULLY BEFORE
+ INSTALLING OR USING THIS SOFTWARE. BY INSTALLING OR USING ARKASOFT
+ NOTEPAD YOU ACCEPT THE TERMS OF THIS AGREEMENT.
+
+--------------------------------------------------------------------------
+ 1. GRANT OF LICENSE
+--------------------------------------------------------------------------
+ ArkaSoft Notepad ("the Software") is freeware. ArkaSoftware grants you
+ a non-exclusive, royalty-free license to:
+
+   - Install and use the Software on any number of devices for personal,
+     academic, or commercial purposes, free of charge.
+   - Make copies of the Software for backup purposes.
+   - Redistribute unmodified copies of the original installation package
+     free of charge, including bundling it with your own installers,
+     provided that all files remain unmodified and this license is
+     included.
+
+--------------------------------------------------------------------------
+ 2. OWNERSHIP
+--------------------------------------------------------------------------
+ The Software is licensed, not sold. All rights, title, and interest in
+ and to the Software, including its name, logo, source code, and
+ documentation, remain the exclusive property of Saeed Rajabi and
+ ArkaSoftware.
+
+--------------------------------------------------------------------------
+ 3. RESTRICTIONS
+--------------------------------------------------------------------------
+ You may NOT:
+
+   - Sell, rent, lease, or sublicense the Software itself for a fee.
+   - Modify, reverse engineer, decompile, or disassemble the Software,
+     except where such restriction is prohibited by applicable law.
+   - Remove or alter any copyright, trademark, or proprietary notices
+     contained in the Software or its documentation.
+   - Distribute modified versions of the Software under the same name
+     or logo.
+
+--------------------------------------------------------------------------
+ 4. DATA AND PRIVACY
+--------------------------------------------------------------------------
+ The Software runs entirely on your device. It does not collect,
+ transmit, or share any personal data, usage statistics, or telemetry.
+ User preferences and session data are stored locally in your profile
+ folder (%APPDATA%\ArkaSoft.Notepad).
+
+--------------------------------------------------------------------------
+ 5. THIRD-PARTY COMPONENTS
+--------------------------------------------------------------------------
+ This Software is built on the .NET runtime (c) Microsoft Corporation
+ and may include the Vazir font, distributed under the SIL Open Font
+ License. All third-party components remain the property of their
+ respective owners and are used under their own licenses.
+
+--------------------------------------------------------------------------
+ 6. WARRANTY DISCLAIMER
+--------------------------------------------------------------------------
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+ NON-INFRINGEMENT. YOU ASSUME THE ENTIRE RISK OF USING THE SOFTWARE.
+
+--------------------------------------------------------------------------
+ 7. LIMITATION OF LIABILITY
+--------------------------------------------------------------------------
+ IN NO EVENT SHALL THE AUTHOR OR ARKASOFTWARE BE LIABLE FOR ANY DIRECT,
+ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ (INCLUDING LOSS OF DATA, LOSS OF PROFIT, OR BUSINESS INTERRUPTION)
+ ARISING OUT OF OR IN ANY WAY RELATED TO THE USE OF THE SOFTWARE, EVEN
+ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------
+ 8. TERMINATION
+--------------------------------------------------------------------------
+ This license is effective until terminated. Your rights under this
+ license terminate automatically if you fail to comply with its terms.
+ Upon termination you must uninstall and destroy all copies of the
+ Software.
+
+--------------------------------------------------------------------------
+ 9. CONTACT
+--------------------------------------------------------------------------
+ ArkaSoftware - Saeed Rajabi
+ Website: https://arkasoftware.ir
+==========================================================================

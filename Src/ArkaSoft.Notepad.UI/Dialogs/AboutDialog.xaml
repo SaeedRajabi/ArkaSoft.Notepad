@@ -1,0 +1,57 @@
+<Window x:Class="ArkaSoft.Notepad.UI.Dialogs.AboutDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="NoResize" ShowInTaskbar="False" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        Width="430"
+        FlowDirection="{DynamicResource Ui.Direction}"
+        MouseLeftButtonDown="Window_DragMove"
+        UseLayoutRounding="True" SnapsToDevicePixels="True">
+    <Border Background="{DynamicResource C.Surface}" CornerRadius="8"
+            BorderBrush="{DynamicResource C.Line}" BorderThickness="1"
+            Margin="16" Padding="28,24,28,22"
+            Effect="{DynamicResource Fx.Popup}">
+        <StackPanel>
+            <!-- app identity -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Image Source="/Assets/Icons/appLogo.png" Width="44" Height="44"
+                       VerticalAlignment="Center"/>
+                <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                    <TextBlock x:Name="AppNameText" FontFamily="{DynamicResource F.Ui}"
+                               FontSize="20" FontWeight="SemiBold"
+                               Foreground="{DynamicResource C.Text}"/>
+                    <TextBlock x:Name="VersionText" FontFamily="{DynamicResource F.Ui}"
+                               FontSize="12" Foreground="{DynamicResource C.Text2}" Margin="0,2,0,0"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Rectangle Height="1" Fill="{DynamicResource C.Line}" Margin="0,16"/>
+
+            <!-- credits -->
+            <TextBlock x:Name="DevByText" FontFamily="{DynamicResource F.Ui}" FontSize="13.5"
+                       Foreground="{DynamicResource C.Text}" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="TeamText" FontFamily="{DynamicResource F.Ui}" FontSize="13"
+                       Foreground="{DynamicResource C.Text2}" HorizontalAlignment="Center"
+                       Margin="0,7,0,0"/>
+
+            <!-- site -->
+            <TextBlock HorizontalAlignment="Center" Margin="0,12,0,0"
+                       FontFamily="{DynamicResource F.Ui}" FontSize="13">
+                <Hyperlink x:Name="SiteLink" Click="SiteLink_Click"
+                           Foreground="{DynamicResource C.Accent}"
+                           TextDecorations="Underline">
+                    <Run Text="https://arkasoftware.ir"/>
+                </Hyperlink>
+            </TextBlock>
+
+            <Rectangle Height="1" Fill="{DynamicResource C.Line}" Margin="0,16"/>
+
+            <TextBlock x:Name="CopyrightText" FontFamily="{DynamicResource F.Ui}" FontSize="11.5"
+                       Foreground="{DynamicResource C.TextDisabled}" HorizontalAlignment="Center"/>
+
+            <Button Content="Close" MinWidth="130" HorizontalAlignment="Center"
+                    Margin="0,16,0,0" Click="Close_Click"/>
+        </StackPanel>
+    </Border>
+</Window>
